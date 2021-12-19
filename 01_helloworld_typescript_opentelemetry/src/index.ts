@@ -3,13 +3,27 @@ import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 
-function sleep(ms: number) {
-  const activeSpan = opentelemetry.trace.getSpan(opentelemetry.context.active());
+const tracerName = 'default'
+
+function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * max)
+}
+
+function sleep(ms: number, parentSpan: any) {
+  // const parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
+  const activeSpan = opentelemetry.trace.getTracer(tracerName).startSpan('sleep', undefined, ctx)
   activeSpan?.setAttribute('time', ms)
 
   return new Promise((resolve) => {
+    activeSpan?.addEvent('About to sleep')
+    logger.info(`Sleep for ${ms}`)
     setTimeout(resolve, ms)
     activeSpan?.end()
+    /*setTimeout(() => {
+      activeSpan?.end()
+      return resolve
+    }, ms)*/
   })
 }
 
@@ -20,7 +34,7 @@ export async function main(): Promise<string> {
   const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
   await configureHoneycomb(apikey, dataset, servicename)
 
-  const activeSpan = opentelemetry.trace.getTracer('default').startSpan('main')
+  const activeSpan = opentelemetry.trace.getTracer(tracerName).startSpan('main')
   if (activeSpan == undefined) {
     logger.error('No active span')
   }
@@ -30,7 +44,9 @@ export async function main(): Promise<string> {
 
   logger.info('Hello world!!!!')
 
-  await sleep(Number(1 * 1000))
+  for (let x = 0; x < getRandomInt(9) + 1; x++) {
+    await sleep(getRandomInt(2000), activeSpan)
+  }
 
   activeSpan?.end()
 

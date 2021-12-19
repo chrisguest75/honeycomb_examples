@@ -276,3 +276,13 @@ https://ui.honeycomb.io/account
 
 
 https://docs.honeycomb.io/getting-started/quickstart/#step-2-instrument-your-application-to-send-telemetry-data-to-honeycomb
+
+https://logz.io/learn/opentelemetry-guide/#concepts
+
+
+https://github.com/lightstep/opentelemetry-examples/tree/main/nodejs
+
+https://opentelemetry.io/docs/instrumentation/js/instrumentation/#create-spans
+
+https://medium.com/@tedsuo/opentelemetry-nodejs-all-you-need-to-know-a4e1c8f2f93
+

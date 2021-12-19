@@ -41,7 +41,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
 
   // .catch((error: Error) => logger.error('Error initializing tracing', error))
 
-  process.on('SIGTERM', () => {
-    shutdownHoneycomb()
-  })
+  process.on('exit', shutdownHoneycomb)
+  process.on('SIGINT', shutdownHoneycomb)
+  process.on('SIGTERM', shutdownHoneycomb)
 }

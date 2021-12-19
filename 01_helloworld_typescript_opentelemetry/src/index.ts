@@ -2,6 +2,7 @@ import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
+import * as axios from 'axios'
 
 const tracerName = 'default'
 
@@ -25,6 +26,16 @@ function sleep(ms: number, parentSpan: any) {
   })
 }
 
+async function fetchFacts() {
+  return new Promise((resolve) => {
+    axios.default.get('https://cat-fact.herokuapp.com/facts').then((res) => {
+      logger.info(`statusCode: ${res.status}`)
+      logger.info(res)
+      resolve('Complete')
+    })
+  })
+}
+
 export async function main(): Promise<string> {
   // var a = 0
   const apikey = process.env.HONEYCOMB_APIKEY ?? ''
@@ -41,7 +52,15 @@ export async function main(): Promise<string> {
   logger.info(`Pino:${logger.version}`)
 
   for (let x = 0; x < getRandomInt(9) + 1; x++) {
-    await sleep(getRandomInt(2000), activeSpan)
+    const s = sleep(getRandomInt(2000), activeSpan)
+
+    const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+    const fetchSpan = opentelemetry.trace.getTracer(tracerName).startSpan('fetch', undefined, ctx)
+    await fetchFacts()
+    fetchSpan?.end()
+
+    await s
+
     logger.info('Hello world!!!!')
   }
 

@@ -266,23 +266,23 @@ npm install --save @opentelemetry/auto-instrumentations-node
 npm install dotenv       
 ```
 
-https://ui.honeycomb.io/account
+Copy the `./.env.template` to `./.env` and get APIKEY from [honeycomb account](https://ui.honeycomb.io/account)
+
+```sh
+#test it
+npm run start:dev
+```
 
 ## Resources
 
 * How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
 * How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
 * OpenTelemetry for JavaScript [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)  
-
-
-https://docs.honeycomb.io/getting-started/quickstart/#step-2-instrument-your-application-to-send-telemetry-data-to-honeycomb
-
-https://logz.io/learn/opentelemetry-guide/#concepts
-
-
-https://github.com/lightstep/opentelemetry-examples/tree/main/nodejs
-
-https://opentelemetry.io/docs/instrumentation/js/instrumentation/#create-spans
-
-https://medium.com/@tedsuo/opentelemetry-nodejs-all-you-need-to-know-a4e1c8f2f93
-
+* Step 2: Instrument Your Application to Send Telemetry Data to Honeycomb [here](https://docs.honeycomb.io/getting-started/quickstart/#step-2-instrument-your-application-to-send-telemetry-data-to-honeycomb)
+* Service Instrumentation: The Basic Concepts [here](https://logz.io/learn/opentelemetry-guide/#concepts)
+* lightstep/opentelemetry-examples repo [here](https://github.com/lightstep/opentelemetry-examples/tree/main/nodejs)
+* Create spans [here](https://opentelemetry.io/docs/instrumentation/js/instrumentation/#create-spans)
+* OpenTelemetry JavaScript Tracing API Documentation [here](https://opentelemetry.io/docs/instrumentation/js/api/tracing/)
+* OpenTelemetry for NodeJS: All you need to know about tracing [here](https://medium.com/@tedsuo/opentelemetry-nodejs-all-you-need-to-know-a4e1c8f2f93)
+* axios/axios repo [here](https://github.com/axios/axios)
+* Cat Facts API Documentation [here](https://alexwohlbruck.github.io/cat-facts/docs/)

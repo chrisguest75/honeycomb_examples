@@ -7,36 +7,41 @@ import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 
+
 const metadata = new Metadata()
-const apikey = process.env.HONEYCOMB_APIKEY ?? ''
-const dataset = process.env.HONEYCOMB_DATASET ?? ''
-const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
-logger.info(`${apikey} for ${dataset}`)
-metadata.set('x-honeycomb-team', apikey)
-metadata.set('x-honeycomb-dataset', dataset)
-const traceExporter = new OTLPTraceExporter({
-  url: 'grpc://api.honeycomb.io:443/',
-  credentials: credentials.createSsl(),
-  metadata,
-})
+let sdk: any = null
 
-const sdk = new NodeSDK({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: servicename,
-  }),
-  traceExporter,
-  instrumentations: [getNodeAutoInstrumentations()],
-})
-
-sdk
-  .start()
-  .then(() => logger.info('Tracing initialized'))
-  .catch((error) => logger.error('Error initializing tracing', error))
-
-process.on('SIGTERM', () => {
-  sdk
+export async function shutdownHoneycomb() {
+  await sdk
     .shutdown()
     .then(() => logger.info('Tracing terminated'))
-    .catch((error) => logger.error('Error terminating tracing', error))
-    .finally(() => process.exit(0))
-})
+    .catch((error: Error) => logger.error('Error terminating tracing', error))
+}
+
+export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
+  logger.info(`${apikey} for ${dataset}`)
+  metadata.set('x-honeycomb-team', apikey)
+  metadata.set('x-honeycomb-dataset', dataset)
+  const traceExporter = new OTLPTraceExporter({
+    url: 'grpc://api.honeycomb.io:443/',
+    credentials: credentials.createSsl(),
+    metadata,
+  })
+
+  sdk = new NodeSDK({
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: servicename,
+    }),
+    traceExporter,
+    instrumentations: [getNodeAutoInstrumentations()],
+  })
+
+  await sdk.start()
+  logger.info('Tracing initialized')
+
+  // .catch((error: Error) => logger.error('Error initializing tracing', error))
+
+  process.on('SIGTERM', () => {
+    shutdownHoneycomb()
+  })
+}

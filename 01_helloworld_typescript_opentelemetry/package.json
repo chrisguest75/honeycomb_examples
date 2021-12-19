@@ -41,7 +41,8 @@
       "src",
       "nodemon.json",
       "tsconfig.json",
-      "package.json"
+      "package.json",
+      ".env"
     ],
     "ext": "ts",
     "ignore": [],

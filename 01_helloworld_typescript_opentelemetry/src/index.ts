@@ -18,12 +18,10 @@ function sleep(ms: number, parentSpan: any) {
   return new Promise((resolve) => {
     activeSpan?.addEvent('About to sleep')
     logger.info(`Sleep for ${ms}`)
-    setTimeout(resolve, ms)
-    activeSpan?.end()
-    /*setTimeout(() => {
+    setTimeout(() => {
       activeSpan?.end()
-      return resolve
-    }, ms)*/
+      resolve('Complete')
+    }, ms)
   })
 }
 
@@ -42,10 +40,9 @@ export async function main(): Promise<string> {
 
   logger.info(`Pino:${logger.version}`)
 
-  logger.info('Hello world!!!!')
-
   for (let x = 0; x < getRandomInt(9) + 1; x++) {
     await sleep(getRandomInt(2000), activeSpan)
+    logger.info('Hello world!!!!')
   }
 
   activeSpan?.end()

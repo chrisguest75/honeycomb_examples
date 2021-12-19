@@ -246,7 +246,33 @@ code .
 
 The code should break on the breakpoint.  
 
+## Add pino logging
+
+```sh
+npm install pino     
+npm install --save-dev @types/pino   
+```
+
+## Integrate Honeycomb
+
+Follow "OpenTelemetry for JavaScript" [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)
+
+```sh
+npm install --save @grpc/grpc-js
+npm install --save @opentelemetry/api
+npm install --save @opentelemetry/sdk-node
+npm install --save @opentelemetry/exporter-trace-otlp-grpc
+npm install --save @opentelemetry/auto-instrumentations-node
+npm install dotenv       
+```
+
+https://ui.honeycomb.io/account
+
 ## Resources
 
 * How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
 * How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
+* OpenTelemetry for JavaScript [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)  
+
+
+https://docs.honeycomb.io/getting-started/quickstart/#step-2-instrument-your-application-to-send-telemetry-data-to-honeycomb

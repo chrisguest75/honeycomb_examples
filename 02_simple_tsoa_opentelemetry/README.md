@@ -266,3 +266,63 @@ The code should break on the breakpoint.
 
 * How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
 * How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
+
+* Building REST API with Express, TypeScript and Swagger [here](https://rsbh.dev/blog/rest-api-with-express-typescript)
+* initializing-our-project [here](https://tsoa-community.github.io/docs/getting-started.html#initializing-our-project)
+* Logging with pino & TypeScript JavaScript/Express.js [here](https://blog.morizyun.com/javascript/library-typescript-pino-logger.html)  
+* Swagger, NodeJS, & TypeScript : TSOA [here](https://medium.com/willsonic/swagger-nodejs-typescript-tsoa-15a3f10fabaf)
+* Repo [express-pino-logger](https://github.com/pinojs/express-pino-logger#readme)  
+* Repo [tsoa](https://github.com/lukeautry/tsoa)  
+* Repo [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express)  
+
+
+https://tsoa-community.github.io/docs/getting-started.html
+
+
+Add a `tsoa.json` file
+
+```sh
+cat << EOF > ./tsoa.json
+{
+    "entryFile": "src/index.ts",
+    "noImplicitAdditionalProperties": "throw-on-extras",
+    "controllerPathGlobs": ["src/**/*Controller.ts"],    
+    "spec": {
+      "basePath": "/",
+      "outputDirectory": "public",
+      "specVersion": 3
+    },
+    "routes": {
+      "routesDir": "src/routes",
+      "middleware": "express"
+    }
+}
+EOF
+```
+
+```bash
+mkdir -p ./src/controllers
+mkdir -p ./src/routes
+```
+
+Add a `PingController.json` file
+
+```sh
+cat << EOF > ./src/controllers/PingController.ts
+import { Get, Route } from "tsoa";
+
+interface PingResponse {
+  message: string;
+}
+
+@Route("ping")
+export class PingController {
+  @Get("/")
+  public async getMessage(): Promise<PingResponse> {
+    return {
+      message: "pong",
+    };
+  }
+}
+EOF
+```

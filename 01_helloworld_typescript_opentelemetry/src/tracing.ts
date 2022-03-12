@@ -7,7 +7,6 @@ import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 
-
 const metadata = new Metadata()
 let sdk: any = null
 
@@ -36,12 +35,15 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     instrumentations: [getNodeAutoInstrumentations()],
   })
 
-  await sdk.start()
+  await sdk.start().catch((error: Error) => logger.error('Error initializing tracing', error))
   logger.info('Tracing initialized')
-
-  // .catch((error: Error) => logger.error('Error initializing tracing', error))
 
   process.on('exit', shutdownHoneycomb)
   process.on('SIGINT', shutdownHoneycomb)
   process.on('SIGTERM', shutdownHoneycomb)
+  process.on('uncaughtException', async (error) => {
+    logger.error(error)
+    await shutdownHoneycomb()
+    process.exit(1)
+  })
 }

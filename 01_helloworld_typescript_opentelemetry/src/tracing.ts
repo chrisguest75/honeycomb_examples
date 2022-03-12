@@ -19,7 +19,7 @@ export async function shutdownHoneycomb() {
 }
 
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
-  logger.info(`${apikey} for ${dataset}`)
+  logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
   metadata.set('x-honeycomb-team', apikey)
   metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({

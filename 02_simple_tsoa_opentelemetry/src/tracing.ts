@@ -6,11 +6,13 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+import opentelemetry from '@opentelemetry/api'
 
 const metadata = new Metadata()
 let sdk: any = null
 
 export async function shutdownHoneycomb() {
+  logger.info('shutdownHoneycomb')
   await sdk
     .shutdown()
     .then(() => logger.info('Tracing terminated'))
@@ -32,15 +34,36 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
       [SemanticResourceAttributes.SERVICE_NAME]: servicename,
     }),
     traceExporter,
-    instrumentations: [getNodeAutoInstrumentations()],
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        // load custom configuration for http instrumentation
+        '@opentelemetry/instrumentation-http': {
+          applyCustomAttributesOnSpan: (span) => {
+            span.setAttribute('foo2', 'bar2')
+          },
+        },
+      }),
+    ],
   })
 
-  await sdk.start()
-  logger.info('Tracing initialized')
-
-  // .catch((error: Error) => logger.error('Error initializing tracing', error))
+  await sdk
+    .start()
+    .then(() => {
+      logger.info('Tracing initialized')
+      const activeSpan = opentelemetry.trace
+        .getTracer('startup')
+        .startSpan('init', undefined, opentelemetry.context.active())
+      activeSpan?.addEvent('Tracing initialized', {})
+      activeSpan?.end()
+    })
+    .catch((error: Error) => logger.error('Error initializing tracing', error))
 
   process.on('exit', shutdownHoneycomb)
   process.on('SIGINT', shutdownHoneycomb)
   process.on('SIGTERM', shutdownHoneycomb)
+  process.on('uncaughtException', async (error) => {
+    logger.error(error)
+    await shutdownHoneycomb()
+    process.exit(1)
+  })
 }

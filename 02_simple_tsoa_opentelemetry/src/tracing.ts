@@ -39,9 +39,10 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
         // load custom configuration for http instrumentation
         '@opentelemetry/instrumentation-http': {
           applyCustomAttributesOnSpan: (span) => {
-            span.setAttribute('foo2', 'bar2')
+            span.setAttribute('instrumentation-http', 'true')
           },
         },
+        '@opentelemetry/instrumentation-express': {},
       }),
     ],
   })

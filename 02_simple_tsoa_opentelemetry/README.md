@@ -1,8 +1,8 @@
 # README
 
-Demonstrates a simple cmdline application (copy these steps)  
+Demonstrates a simple TSOA OpenAPI app with OpenTelemetry.  
 
-Follow this: https://tsoa-community.github.io/docs/getting-started.html and update docs
+Follow this: https://tsoa-community.github.io/docs/getting-started.html and update docs  
 
 ## How to run
 

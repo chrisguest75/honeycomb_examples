@@ -24,12 +24,21 @@ TODO:
 * `Semantic Attributes` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
 * `Instrumentation`
 
+TODO: 
+
+* create client
+
 ## 01 - Basic helloworld opentelemetry
 
 Demonstrates a simple cmdline application (copy these steps)  
 
 [README.md](./01_helloworld_typescript_opentelemetry/README.md)  
 
+## 02 - TSOA opentelemetry
+
+Demonstrates a TSOA based service using OpenTelemetry
+
+[README.md](./02_simple_tsoa_opentelemetry/README.md)  
 
 ## Resources
 
@@ -54,3 +63,6 @@ https://github.com/mnadeem/nodejs-opentelemetry-tempo
 
 https://www.npmjs.com/package/@opentelemetry/context-async-hooks
 
+## Resources
+
+https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/

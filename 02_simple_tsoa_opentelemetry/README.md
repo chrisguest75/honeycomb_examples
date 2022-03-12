@@ -10,7 +10,7 @@ Follow this: https://tsoa-community.github.io/docs/getting-started.html and upda
 npm install
 
 # run targets
-npm run start:dev
+npm run start
 npm run test
 npm run lint
 ```
@@ -262,22 +262,26 @@ code .
 
 The code should break on the breakpoint.  
 
-## Resources
 
-* How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
-* How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
+## Integrate Honeycomb
 
-* Building REST API with Express, TypeScript and Swagger [here](https://rsbh.dev/blog/rest-api-with-express-typescript)
-* initializing-our-project [here](https://tsoa-community.github.io/docs/getting-started.html#initializing-our-project)
-* Logging with pino & TypeScript JavaScript/Express.js [here](https://blog.morizyun.com/javascript/library-typescript-pino-logger.html)  
-* Swagger, NodeJS, & TypeScript : TSOA [here](https://medium.com/willsonic/swagger-nodejs-typescript-tsoa-15a3f10fabaf)
-* Repo [express-pino-logger](https://github.com/pinojs/express-pino-logger#readme)  
-* Repo [tsoa](https://github.com/lukeautry/tsoa)  
-* Repo [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express)  
+Follow "OpenTelemetry for JavaScript" [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)
 
+```sh
+npm install --save @grpc/grpc-js
+npm install --save @opentelemetry/api
+npm install --save @opentelemetry/sdk-node
+npm install --save @opentelemetry/exporter-trace-otlp-grpc
+npm install --save @opentelemetry/auto-instrumentations-node
+npm install dotenv       
+```
 
-https://tsoa-community.github.io/docs/getting-started.html
+Copy the `./.env.template` to `./.env` and get APIKEY from [honeycomb account](https://ui.honeycomb.io/account)
 
+```sh
+#test it
+npm run start:dev
+```
 
 Add a `tsoa.json` file
 
@@ -326,3 +330,25 @@ export class PingController {
 }
 EOF
 ```
+
+
+## Resources
+
+* How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
+* How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
+
+* Building REST API with Express, TypeScript and Swagger [here](https://rsbh.dev/blog/rest-api-with-express-typescript)
+* initializing-our-project [here](https://tsoa-community.github.io/docs/getting-started.html#initializing-our-project)
+* Logging with pino & TypeScript JavaScript/Express.js [here](https://blog.morizyun.com/javascript/library-typescript-pino-logger.html)  
+* Swagger, NodeJS, & TypeScript : TSOA [here](https://medium.com/willsonic/swagger-nodejs-typescript-tsoa-15a3f10fabaf)
+* Repo [express-pino-logger](https://github.com/pinojs/express-pino-logger#readme)  
+* Repo [tsoa](https://github.com/lukeautry/tsoa)  
+* Repo [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express)  
+
+
+https://tsoa-community.github.io/docs/getting-started.html
+
+
+https://lightstep.com/blog/opentelemetry-nodejs-express/
+
+

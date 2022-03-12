@@ -1,6 +1,6 @@
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span } from '@opentelemetry/api'
+import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 import * as axios from 'axios'
 
@@ -41,8 +41,10 @@ async function fetchUrl(url: string, parentSpan: Span) {
         activeSpan?.end()
         resolve('Complete')
       })
-      .catch((e) => {
-        logger.error(e)
+      .catch((error) => {
+        logger.error(error)
+        activeSpan.recordException(error)
+        activeSpan.setStatus({ code: SpanStatusCode.ERROR })
         activeSpan?.end()
         reject('Error')
       })
@@ -51,11 +53,17 @@ async function fetchUrl(url: string, parentSpan: Span) {
 
 async function fetchFacts() {
   return new Promise((resolve, reject) => {
-    axios.default.get('https://cat-fact.herokuapp.com/facts').then((res) => {
-      logger.info(`statusCode: ${res.status}`)
-      logger.info(res)
-      resolve('Complete')
-    })
+    axios.default
+      .get('https://cat-fact.herokuapp.com/facts')
+      .then((res) => {
+        logger.info(`statusCode: ${res.status}`)
+        logger.info(res)
+        resolve('Complete')
+      })
+      .catch((error) => {
+        logger.error(error)
+        reject('Error')
+      })
   })
 }
 
@@ -68,13 +76,23 @@ async function fetchFactsInternalSpan() {
   }
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
   const activeSpan = tracer.startSpan('fetchFactsInternalSpan', undefined, ctx)
-  return new Promise((resolve) => {
-    axios.default.get('https://cat-fact.herokuapp.com/facts').then((res) => {
-      logger.info(`statusCode: ${res.status}`)
-      logger.info(res)
-      resolve('Complete')
-    })
-    activeSpan?.end()
+  return new Promise((resolve, reject) => {
+    axios.default
+      .get('https://cat-fact.herokuapp.com/facts')
+      .then((res) => {
+        logger.info(`statusCode: ${res.status}`)
+        logger.info(res)
+        activeSpan.setStatus({ code: SpanStatusCode.OK })
+        activeSpan?.end()
+        resolve('Complete')
+      })
+      .catch((error) => {
+        logger.error(error)
+        activeSpan.recordException(error)
+        activeSpan.setStatus({ code: SpanStatusCode.ERROR })
+        activeSpan?.end()
+        reject('Error')
+      })
   })
 }
 

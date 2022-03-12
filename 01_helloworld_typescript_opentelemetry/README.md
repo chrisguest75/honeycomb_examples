@@ -2,6 +2,14 @@
 
 Demonstrates a simple cmdline application (copy these steps)  
 
+Contains:
+
+* Hierarchical span creation
+* Exception handling and setting status codes
+* Global exception handler
+* Logging events with spans
+* Async handling
+
 ## How to run
 
 ```sh

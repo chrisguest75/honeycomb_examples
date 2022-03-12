@@ -3,6 +3,7 @@ import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 import * as axios from 'axios'
+import https from 'https'
 
 // tracer for the file
 const tracerName = 'default'
@@ -25,6 +26,58 @@ function sleep(ms: number, parentSpan: Span) {
       activeSpan?.end()
       resolve('Complete')
     }, ms)
+  })
+}
+
+async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
+  const activeSpan = tracer.startSpan('httpsFetchUrl', undefined, ctx)
+
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: url,
+      port: 443,
+      path: path,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+
+    const req = https.request(options, (res) => {
+      // reject on bad status
+      if (res.statusCode == null || res.statusCode < 200 || res.statusCode >= 300) {
+        activeSpan?.end()
+        return reject(new Error('statusCode=' + res.statusCode))
+      }
+      // cumulate data
+      let body: any = []
+      res.on('data', (chunk) => {
+        body.push(chunk)
+      })
+      // resolve on end
+      res.on('end', () => {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString())
+          resolve(body)
+          activeSpan?.end()
+        }
+        catch(e) {
+          activeSpan?.end()
+          reject(e)
+        }
+      })
+    })
+
+    // reject on request error
+    req.on('error', (err) => {
+      activeSpan?.end()
+      // This is not a "Second reject", just a different sort of failure
+      reject(err)
+    })
+
+    // IMPORTANT
+    req.end()
   })
 }
 
@@ -147,9 +200,17 @@ export async function main(): Promise<string> {
     } catch (error) {
       logger.error(error)
     }
+    try {
+      const url = 'cat-fact.herokuapp.com'
+      const path = '/facts'
+      activeSpan?.addEvent(`Invoking httpsFetchUrl(${url}${path})`, { loopcount: x })
+      await httpsFetchUrl(url, path, activeSpan)
+    } catch (error) {
+      logger.error(error)
+    }
 
-    activeSpan?.addEvent('Hello world event!!!!')
-    logger.info('Hello world event!!!!')
+    activeSpan?.addEvent(`Hello world event ${x}!!!!`)
+    logger.info(`Hello world event ${x}!!!!`)
   }
 
   activeSpan?.end()

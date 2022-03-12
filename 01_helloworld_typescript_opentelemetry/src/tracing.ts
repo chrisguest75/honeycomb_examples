@@ -11,6 +11,7 @@ const metadata = new Metadata()
 let sdk: any = null
 
 export async function shutdownHoneycomb() {
+  logger.info('shutdownHoneycomb')
   await sdk
     .shutdown()
     .then(() => logger.info('Tracing terminated'))
@@ -32,11 +33,22 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
       [SemanticResourceAttributes.SERVICE_NAME]: servicename,
     }),
     traceExporter,
-    instrumentations: [getNodeAutoInstrumentations()],
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        // load custom configuration for http instrumentation
+        '@opentelemetry/instrumentation-http': {
+          applyCustomAttributesOnSpan: (span) => {
+            span.setAttribute('foo2', 'bar2')
+          },
+        },
+      }),
+    ],
   })
 
-  await sdk.start().catch((error: Error) => logger.error('Error initializing tracing', error))
-  logger.info('Tracing initialized')
+  await sdk
+    .start()
+    .then(() => logger.info('Tracing initialized'))
+    .catch((error: Error) => logger.error('Error initializing tracing', error))
 
   process.on('exit', shutdownHoneycomb)
   process.on('SIGINT', shutdownHoneycomb)

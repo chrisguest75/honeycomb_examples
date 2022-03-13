@@ -3,6 +3,15 @@
 Honeycomb examples using OpenTelemetry.  
 NOTE: Requires a free tier account in Honeycomb.  
 
+TODO:
+
+* Express and TSOA (not working)
+* Mongo
+* Knex
+* Redis
+* Lambda
+* Dockerised
+
 ## Glossary
 
 * `Spans`

@@ -20,6 +20,12 @@ export async function shutdownHoneycomb() {
 }
 
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
+  // configure otel diagnostics
+  const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
+  if (enableDiag.toLowerCase() == 'true') {
+    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
+  }
+
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
   metadata.set('x-honeycomb-team', apikey)
   metadata.set('x-honeycomb-dataset', dataset)
@@ -39,7 +45,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
         // load custom configuration for http instrumentation
         '@opentelemetry/instrumentation-http': {
           applyCustomAttributesOnSpan: (span) => {
-            span.setAttribute('foo2', 'bar2')
+            span.setAttribute('instrumentation-http', 'true')
           },
         },
       }),
@@ -51,7 +57,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     .then(() => {
       logger.info('Tracing initialized')
       const activeSpan = opentelemetry.trace
-        .getTracer('startup')
+        .getTracer(servicename)
         .startSpan('init', undefined, opentelemetry.context.active())
       activeSpan?.addEvent('Tracing initialized', {})
       activeSpan?.end()
@@ -66,10 +72,4 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     await shutdownHoneycomb()
     process.exit(1)
   })
-
-  // configure otel diagnostics
-  const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
-  if (enableDiag.toLowerCase() == 'true') {
-    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
-  }
 }

@@ -16,10 +16,13 @@ TODO:
 ## Glossary
 
 * `Spans`
+* `SpanKind`
 * `Events`
 * `Context`
 * `Trace`
 * `Context Handler`
+* `Semantic Attributes` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
+* `Instrumentation`
 
 ## 01 - Basic helloworld opentelemetry
 
@@ -30,9 +33,12 @@ Demonstrates a simple cmdline application (copy these steps)
 
 ## Resources
 
-https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
+* A language-specific implementation of OpenTelemetry in JavaScript (for Node.JS & the browser). [here](https://opentelemetry.io/docs/instrumentation/js/)
+* OTEL JS package [here](https://github.com/open-telemetry/opentelemetry-js)
+* OTEL JS instrumentation packages [here](https://github.com/open-telemetry/opentelemetry-js-contrib)
 
-https://opentelemetry.io/docs/instrumentation/js/
+
+https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
 
 https://github.com/honeycombio/workshop-advanced-instrumentation
 

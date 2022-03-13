@@ -34,18 +34,22 @@ Demonstrates a simple cmdline application (copy these steps)
 
 ## Resources
 
+### Open Telemetry
+
 * A language-specific implementation of OpenTelemetry in JavaScript (for Node.JS & the browser). [here](https://opentelemetry.io/docs/instrumentation/js/)
 * OTEL JS package [here](https://github.com/open-telemetry/opentelemetry-js)
 * OTEL JS instrumentation packages [here](https://github.com/open-telemetry/opentelemetry-js-contrib)
 
+### Repos
+
+* workshop-advanced-instrumentation [repo](https://github.com/honeycombio/workshop-advanced-instrumentation)
 
 
 * Build Events [here](https://github.com/honeycombio/buildevents)
 
 
-https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
 
-https://github.com/honeycombio/workshop-advanced-instrumentation
+https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
 
 https://github.com/mnadeem/nodejs-opentelemetry-tempo
 

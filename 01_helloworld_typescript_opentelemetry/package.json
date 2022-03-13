@@ -15,7 +15,11 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "docker:build": "docker build --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 01_helloworld_typescript_opentelemetry .",
+    "docker:rebuild": "docker build --no-cache --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 01_helloworld_typescript_opentelemetry .",
+    "docker:run": "npm run docker:build && docker run --env-file ./.env --rm -it --name 01_helloworld_typescript_opentelemetry 01_helloworld_typescript_opentelemetry",
+    "docker:stop": "docker stop 01_helloworld_typescript_opentelemetry"
   },
   "keywords": [],
   "author": "",

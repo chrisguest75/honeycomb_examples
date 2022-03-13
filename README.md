@@ -38,6 +38,10 @@ Demonstrates a simple cmdline application (copy these steps)
 * OTEL JS instrumentation packages [here](https://github.com/open-telemetry/opentelemetry-js-contrib)
 
 
+
+* Build Events [here](https://github.com/honeycombio/buildevents)
+
+
 https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
 
 https://github.com/honeycombio/workshop-advanced-instrumentation
@@ -45,3 +49,4 @@ https://github.com/honeycombio/workshop-advanced-instrumentation
 https://github.com/mnadeem/nodejs-opentelemetry-tempo
 
 https://www.npmjs.com/package/@opentelemetry/context-async-hooks
+

@@ -9,6 +9,8 @@ Contains:
 * Global exception handler
 * Logging events with spans
 * Async handling
+* Semantic Attributes
+* OTEL Diagnostics
 
 ## How to run
 

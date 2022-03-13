@@ -7,6 +7,7 @@ import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -35,9 +36,12 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     metadata,
   })
 
+  const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
+
   sdk = new NodeSDK({
     resource: new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: servicename,
+      [SemanticResourceAttributes.SERVICE_VERSION]: serviceversion,
     }),
     traceExporter,
     instrumentations: [
@@ -49,6 +53,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
           },
         },
       }),
+      new HttpInstrumentation(),
     ],
   })
 

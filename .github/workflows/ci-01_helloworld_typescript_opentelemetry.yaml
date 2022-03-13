@@ -58,20 +58,20 @@ jobs:
         docker build --target PRODUCTION --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')" --label "org.opencontainers.image.version=${{ github.sha }}" --label "org.opencontainers.image.url=$(git remote get-url origin)" --no-cache -t docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }} -f Dockerfile .
         buildevents step $GITHUB_RUN_ID $STEP_SPAN_ID $STEP_START "$STEP"
 
-    # this can only be enabled in public repo
-    - name: Scan image using grype
-      uses: anchore/scan-action@v3
-      id: scan
-      with:
-        image: docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }}
-        acs-report-enable: true
-        severity-cutoff: critical
-        fail-build: false
+    # # this can only be enabled in public repo
+    # - name: Scan image using grype
+    #   uses: anchore/scan-action@v3
+    #   id: scan
+    #   with:
+    #     image: docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }}
+    #     acs-report-enable: true
+    #     severity-cutoff: critical
+    #     fail-build: false
 
-    - name: Upload Anchore Grype scan SARIF report
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
+    # - name: Upload Anchore Grype scan SARIF report
+    #   uses: github/codeql-action/upload-sarif@v1
+    #   with:
+    #     sarif_file: ${{ steps.scan.outputs.sarif }}
       
     - name: Build fail
       if: failure()
@@ -82,100 +82,3 @@ jobs:
       if: success()
       run: |
         buildevents build $(cat ../build-tag) $(cat ../build-start) success 
-
-
-  #   - name: semgrep-action
-  #     uses: returntocorp/semgrep-action@v1
-  #     with:
-  #       config: >- # more at semgrep.dev/explore
-  #         r/generic.dockerfile
-  #         r/bash
-  #         p/github-actions
-  #         p/typescript
-  #         r/html.best-practice.robots-denied.robots-denied
-  #         r/html.security.missing-noopener.missing-noopener
-  #         r/html.security.missing-noreferrer.missing-noreferrer
-
-  #       # r/html
-
-        
-
-  #   - name: Build and test the github_of_life Docker image
-  #     run: |
-  #       docker build --target BUILDER --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')" --label "org.opencontainers.image.version=${{ github.sha }}" --label "org.opencontainers.image.url=$(git remote get-url origin)" --no-cache -t docker.pkg.github.com/${{ github.repository }}/github-of-life-build:${{ github.sha }} -f Dockerfile .
-
-  #   - name: Get the test results from container
-  #     run: | 
-  #       docker create --name test_githuboflife docker.pkg.github.com/${{ github.repository }}/github-of-life-build:${{ github.sha }}
-  #       mkdir -p ./test/results
-  #       ls -aR ./test/results
-  #       docker cp test_githuboflife:/scratch/junit.xml ./test/results
-  #       docker rm test_githuboflife
-  #       ls -aR ./test/results
-
-  #   - name: Copy results to artifacts
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: test-results
-  #       path: ./test/results 
-
-
-  #   - name: Linting hadolint, dockle and dive
-  #     run: |
-  #       echo "Installing HADOLINT"
-  #       brew install hadolint        
-  #       echo "Running HADOLINT"
-  #       hadolint ./Dockerfile
-  #       echo "COMPLETE exitcode:$?"
-  #       echo "Installing DOCKLE"
-  #       brew install goodwithtech/r/dockle
-  #       echo "Running DOCKLE"
-  #       dockle docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
-  #       echo "COMPLETE exitcode:$?"
-  #       echo "Installing DIVE"
-  #       brew install dive
-  #       echo "Running DIVE"
-  #       dive docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }} --ci
-  #       echo "COMPLETE exitcode:$?"
-
-  #   - name: Run container-structure-tests
-  #     uses: plexsystems/container-structure-test-action@v0.1.0
-  #     with:
-  #       image: docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
-  #       config: ./container-structure-tests.yaml
-
-  #   # - name: Docker scan
-  #   #   run: |
-  #   #     docker scan docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
-
-  #   # - name: Docker Grype
-  #   #   run: |
-  #   #     brew tap anchore/grype
-  #   #     brew install grype      
-  #   #     grype -o json docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
-
-  
-  # publish-test-results:
-  #   name: "Publish test results"
-  #   needs: build-test
-  #   runs-on: ubuntu-latest
-  #   # the build-and-test job might be skipped, we don't need to run this job then
-  #   if: success() || failure()
-
-  #   steps:
-  #     - name: Download results
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: test-results
-  #         path: ./test/results 
-
-  #     - name: Get the test results from container
-  #       run: | 
-  #         ls -aR ./test/results
-
-  #     - name: Publish results
-  #       uses: EnricoMi/publish-unit-test-result-action@v1.23
-  #       with:
-  #         check_name: Test results
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
-  #         files: ./test/results/*.xml

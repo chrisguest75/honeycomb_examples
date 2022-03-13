@@ -54,9 +54,25 @@ jobs:
         STEP="Build production image"
         STEP_START=$(date +%s)
         STEP_SPAN_ID=$(echo "$STEP" | cksum | cut -f 1 -d \ )
+        cd ./${PROJECT_FOLDER}
         docker build --target PRODUCTION --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')" --label "org.opencontainers.image.version=${{ github.sha }}" --label "org.opencontainers.image.url=$(git remote get-url origin)" --no-cache -t docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }} -f Dockerfile .
         buildevents step $GITHUB_RUN_ID $STEP_SPAN_ID $STEP_START "$STEP"
 
+    # this can only be enabled in public repo
+    - name: Scan image using grype
+      uses: anchore/scan-action@v3
+      id: scan
+      with:
+        image: docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }}
+        acs-report-enable: true
+        severity-cutoff: critical
+        fail-build: false
+
+    - name: Upload Anchore Grype scan SARIF report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif }}
+      
     - name: Build fail
       if: failure()
       run: |
@@ -138,21 +154,7 @@ jobs:
   #   #     brew install grype      
   #   #     grype -o json docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
 
-  #   # this can only be enabled in public repo
-  #   - name: Scan image using grype
-  #     uses: anchore/scan-action@v3
-  #     id: scan
-  #     with:
-  #       image: docker.pkg.github.com/${{ github.repository }}/github-of-life:${{ github.sha }}
-  #       acs-report-enable: true
-  #       severity-cutoff: critical
-  #       fail-build: false
-
-  #   - name: Upload Anchore Grype scan SARIF report
-  #     uses: github/codeql-action/upload-sarif@v1
-  #     with:
-  #       sarif_file: ${{ steps.scan.outputs.sarif }}
-        
+  
   # publish-test-results:
   #   name: "Publish test results"
   #   needs: build-test

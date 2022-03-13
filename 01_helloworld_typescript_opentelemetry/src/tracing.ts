@@ -6,6 +6,7 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -47,7 +48,14 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
 
   await sdk
     .start()
-    .then(() => logger.info('Tracing initialized'))
+    .then(() => {
+      logger.info('Tracing initialized')
+      const activeSpan = opentelemetry.trace
+        .getTracer('startup')
+        .startSpan('init', undefined, opentelemetry.context.active())
+      activeSpan?.addEvent('Tracing initialized', {})
+      activeSpan?.end()
+    })
     .catch((error: Error) => logger.error('Error initializing tracing', error))
 
   process.on('exit', shutdownHoneycomb)
@@ -58,4 +66,10 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     await shutdownHoneycomb()
     process.exit(1)
   })
+
+  // configure otel diagnostics
+  const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
+  if (enableDiag.toLowerCase() == 'true') {
+    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
+  }
 }

@@ -11,6 +11,7 @@ TODO:
 * Redis
 * Lambda
 * Dockerised
+* Pipeline telemetry (github actions)
 
 ## Glossary
 

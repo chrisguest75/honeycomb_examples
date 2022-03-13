@@ -132,14 +132,15 @@ async function fetchFacts() {
 
 // try to create a span parented off current span without passing it in. (NOT WORKING ) 
 async function fetchFactsInternalSpan() {
-  let parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
+  /*let parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   //const parentSpan = undefined
   if (parentSpan == undefined) {
     logger.warn(`No active parentspan assigning 'rootless' instead`)
     parentSpan = tracer.startSpan('rootless', undefined, opentelemetry.context.active())
   }
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
-  const activeSpan = tracer.startSpan('fetchFactsInternalSpan', undefined, ctx)
+  const activeSpan = tracer.startSpan('fetchFactsInternalSpan', undefined, ctx)*/
+  const activeSpan = tracer.startSpan('fetchFactsInternalSpan')
   return new Promise((resolve, reject) => {
     axios.default
       .get('https://cat-fact.herokuapp.com/facts')

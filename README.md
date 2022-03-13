@@ -11,7 +11,6 @@ TODO:
 * Knex or Prisma
 * Redis
 * Lambda
-* Pipeline telemetry (github actions)
 * Propagation
 
 ## Glossary

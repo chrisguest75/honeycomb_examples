@@ -30,7 +30,7 @@ jobs:
     - name: Save starttime
       run: | 
         echo $(date +%s) > ../build-start
-        echo "$GIHUB_REPOSITORY-$(cat git-hash)-$GITHUB_RUN_ID" > ../build-tag
+        echo "${{ github.sha }}-$GITHUB_RUN_ID" > ../build-tag
 
     - name: Checkout
       uses: actions/checkout@v2

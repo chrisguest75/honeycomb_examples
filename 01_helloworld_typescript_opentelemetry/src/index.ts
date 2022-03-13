@@ -9,10 +9,12 @@ import https from 'https'
 const tracerName = 'default'
 const tracer = opentelemetry.trace.getTracer(tracerName)
 
+// create a random integer
 function getRandomInt(max: number): number {
   return Math.floor(Math.random() * max)
 }
 
+// sleep for a period of time and create a child off passed in span
 function sleep(ms: number, parentSpan: Span) {
   // const parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
@@ -29,6 +31,7 @@ function sleep(ms: number, parentSpan: Span) {
   })
 }
 
+// use http module to request data (for auto instrumentation tests)
 async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
   const activeSpan = tracer.startSpan('httpsFetchUrl', undefined, ctx)
@@ -61,10 +64,9 @@ async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
           body = JSON.parse(Buffer.concat(body).toString())
           resolve(body)
           activeSpan?.end()
-        }
-        catch(e) {
+        } catch (error) {
           activeSpan?.end()
-          reject(e)
+          reject(error)
         }
       })
     })
@@ -81,6 +83,7 @@ async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
   })
 }
 
+// use axios to fetch data and attach span to parent
 async function fetchUrl(url: string, parentSpan: Span) {
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
   const activeSpan = tracer.startSpan('fetchUrl', undefined, ctx)
@@ -88,9 +91,14 @@ async function fetchUrl(url: string, parentSpan: Span) {
   return new Promise((resolve, reject) => {
     axios.default
       .get(url)
-      .then((res) => {
-        logger.info(`statusCode: ${res.status}`)
-        logger.info(res)
+      .then((resp) => {
+        logger.info(`statusCode: ${resp.status}`)
+        logger.info(resp)
+        activeSpan?.setAttribute('http_status', resp.status)
+        // the data-length seems wrong
+        activeSpan?.setAttribute('data-length', resp.data.length)
+        activeSpan?.setAttribute('content-length', resp.headers['content-length'])
+        activeSpan.setStatus({ code: SpanStatusCode.OK })
         activeSpan?.end()
         resolve('Complete')
       })
@@ -104,15 +112,17 @@ async function fetchUrl(url: string, parentSpan: Span) {
   })
 }
 
+// use a span from outside the function
 async function fetchFacts() {
   return new Promise((resolve, reject) => {
     axios.default
       .get('https://cat-fact.herokuapp.com/facts')
-      .then((res) => {
-        logger.info(`statusCode: ${res.status}`)
-        logger.info(res)
+      .then((resp) => {
+        logger.info(`statusCode: ${resp.status}`)
+        logger.info(resp)
         resolve('Complete')
       })
+
       .catch((error) => {
         logger.error(error)
         reject('Error')
@@ -120,6 +130,7 @@ async function fetchFacts() {
   })
 }
 
+// try to create a span parented off current span without passing it in. (NOT WORKING ) 
 async function fetchFactsInternalSpan() {
   let parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   //const parentSpan = undefined
@@ -132,9 +143,13 @@ async function fetchFactsInternalSpan() {
   return new Promise((resolve, reject) => {
     axios.default
       .get('https://cat-fact.herokuapp.com/facts')
-      .then((res) => {
-        logger.info(`statusCode: ${res.status}`)
-        logger.info(res)
+      .then((resp) => {
+        logger.info(`statusCode: ${resp.status}`)
+        logger.info(resp)
+        activeSpan?.setAttribute('http_status', resp.status)
+        // the data-length seems wrong
+        activeSpan?.setAttribute('data-length', resp.data.length)
+        activeSpan?.setAttribute('content-length', resp.headers['content-length'])
         activeSpan.setStatus({ code: SpanStatusCode.OK })
         activeSpan?.end()
         resolve('Complete')

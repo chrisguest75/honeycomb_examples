@@ -1,6 +1,6 @@
 FROM ubuntu:22.04 AS PRODUCTION
 
-RUN apt-get update && apt-get install curl -y \
+RUN apt-get update && apt-get install curl uuid-runtime -y \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
 

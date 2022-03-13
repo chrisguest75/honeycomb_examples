@@ -76,9 +76,9 @@ jobs:
     - name: Build fail
       if: failure()
       run: |
-        buildevents build $(cat ../build-tag) $(cat ../build-start) failure
+        buildevents build $GITHUB_RUN_ID $(cat ../build-start) failure
 
     - name: Build success
       if: success()
       run: |
-        buildevents build $(cat ../build-tag) $(cat ../build-start) success 
+        buildevents build $GITHUB_RUN_ID $(cat ../build-start) success 

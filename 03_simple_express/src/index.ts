@@ -5,6 +5,8 @@ import bodyParser from 'body-parser'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import * as dotenv from 'dotenv'
 import { logger } from './logger'
+import { rootRouter } from '../routes/root'
+import { pingRouter } from '../routes/ping'
 
 function shutDown() {
   return new Promise((resolve, reject) => {
@@ -40,6 +42,8 @@ app.use(
 app.use(bodyParser.json())
 app.use(express.static('public'))
 app.use(pino())
+app.use('/', rootRouter);
+app.use('/ping', pingRouter);
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

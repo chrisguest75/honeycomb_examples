@@ -6,12 +6,13 @@ NOTE: Requires a free tier account in Honeycomb.
 TODO:
 
 * Express and TSOA (not working)
+* Metrics
 * Mongo
-* Knex
+* Knex or Prisma
 * Redis
 * Lambda
-* Dockerised
 * Pipeline telemetry (github actions)
+* Propagation
 
 ## Glossary
 

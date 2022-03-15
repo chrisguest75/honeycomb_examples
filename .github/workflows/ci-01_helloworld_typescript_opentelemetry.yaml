@@ -1,0 +1,84 @@
+name: 01_helloworld_typescript_opentelemetry - CI
+
+on:
+  push:
+    branches: 
+      - '*'
+      - '!main'   # excludes main
+    paths:
+      - '**'
+      - '.github/workflows/ci-01_helloworld_typescript_opentelemetry.yaml'
+
+  pull_request:
+    branches:  
+      - '*'
+      - '!main'   # excludes main
+    paths:
+      - '**'
+      - '.github/workflows/ci-01_helloworld_typescript_opentelemetry.yaml'
+
+jobs:
+  build-test:
+    name: "Build, test, deploy 01_helloworld_typescript_opentelemetry"  
+    runs-on: ubuntu-latest
+    env:
+      BUILDEVENT_APIKEY: ${{ secrets.BUILDEVENT_APIKEY }}
+      BUILDEVENT_DATASET: 'buildevents'
+      BUILDEVENT_CIPROVIDER: 'github-actions'
+      PROJECT_FOLDER: '01_helloworld_typescript_opentelemetry'
+
+    steps:
+    - name: Save starttime
+      run: | 
+        echo $(date +%s) > ../build-start
+        echo "${{ github.sha }}-$GITHUB_RUN_ID" > ../build-tag
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: install honeycomb buildevents tool
+      run: |
+        curl -L -o /usr/local/bin/buildevents https://github.com/honeycombio/buildevents/releases/latest/download/buildevents-linux-amd64 && chmod 755 /usr/local/bin/buildevents
+
+    - name: Create build.json
+      run: | 
+        STEP="Create build.json"
+        STEP_START=$(date +%s)
+        STEP_SPAN_ID=$(echo "$STEP" | cksum | cut -f 1 -d \ )
+        export COMMITID="${{ github.sha }}"
+        cat ./${PROJECT_FOLDER}/src/build.template | envsubst > ./${PROJECT_FOLDER}/src/build.json  
+        buildevents step $GITHUB_RUN_ID $STEP_SPAN_ID $STEP_START "$STEP"
+
+    - name: Build production image
+      run: |
+        STEP="Build production image"
+        STEP_START=$(date +%s)
+        STEP_SPAN_ID=$(echo "$STEP" | cksum | cut -f 1 -d \ )
+        cd ./${PROJECT_FOLDER}
+        docker build --target PRODUCTION --label "org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')" --label "org.opencontainers.image.version=${{ github.sha }}" --label "org.opencontainers.image.url=$(git remote get-url origin)" --no-cache -t docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }} -f Dockerfile .
+        buildevents step $GITHUB_RUN_ID $STEP_SPAN_ID $STEP_START "$STEP"
+
+    # # this can only be enabled in public repo
+    # - name: Scan image using grype
+    #   uses: anchore/scan-action@v3
+    #   id: scan
+    #   with:
+    #     image: docker.pkg.github.com/${{ github.repository }}/${PROJECT_FOLDER}:${{ github.sha }}
+    #     acs-report-enable: true
+    #     severity-cutoff: critical
+    #     fail-build: false
+
+    # - name: Upload Anchore Grype scan SARIF report
+    #   uses: github/codeql-action/upload-sarif@v1
+    #   with:
+    #     sarif_file: ${{ steps.scan.outputs.sarif }}
+      
+    - name: Build fail
+      if: failure()
+      run: |
+        buildevents build $GITHUB_RUN_ID $(cat ../build-start) failure
+
+    - name: Build success
+      if: success()
+      run: |
+        buildevents build $GITHUB_RUN_ID $(cat ../build-start) success 

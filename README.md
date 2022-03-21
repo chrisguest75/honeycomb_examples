@@ -5,6 +5,7 @@ NOTE: Requires a free tier account in Honeycomb.
 
 TODO:
 
+* Jest & Cypress
 * Metrics
 * Mongo
 * Knex or Prisma

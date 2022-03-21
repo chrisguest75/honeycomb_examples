@@ -15,8 +15,10 @@ export class PingController {
   @Get('/')
   public async getMessage(): Promise<PingResponse> {
     const activeSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
+    logger.info('PingController.Get' + activeSpan)
+    activeSpan?.setAttribute('handler', 'PingController.Get')
+
     logger.debug('PingController.Get')
-    activeSpan?.end()
     return {
       message: 'pong',
     }

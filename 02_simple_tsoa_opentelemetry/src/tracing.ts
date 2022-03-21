@@ -1,12 +1,14 @@
-import { logger } from './logger'
-import process from 'process'
 import { Metadata, credentials } from '@grpc/grpc-js'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import opentelemetry from '@opentelemetry/api'
+import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+
+import { logger } from './logger'
+import process from 'process'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -20,6 +22,12 @@ export async function shutdownHoneycomb() {
 }
 
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
+  // configure otel diagnostics
+  const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
+  if (enableDiag.toLowerCase() == 'true') {
+    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
+  }
+
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
   metadata.set('x-honeycomb-team', apikey)
   metadata.set('x-honeycomb-dataset', dataset)
@@ -29,9 +37,12 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     metadata,
   })
 
+  const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
+
   sdk = new NodeSDK({
     resource: new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: servicename,
+      [SemanticResourceAttributes.SERVICE_VERSION]: serviceversion,
     }),
     traceExporter,
     instrumentations: [
@@ -44,6 +55,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
         },
         '@opentelemetry/instrumentation-express': {},
       }),
+      new HttpInstrumentation(),
     ],
   })
 
@@ -52,7 +64,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     .then(() => {
       logger.info('Tracing initialized')
       const activeSpan = opentelemetry.trace
-        .getTracer('startup')
+        .getTracer(servicename)
         .startSpan('init', undefined, opentelemetry.context.active())
       activeSpan?.addEvent('Tracing initialized', {})
       activeSpan?.end()

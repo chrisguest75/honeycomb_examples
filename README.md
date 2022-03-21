@@ -43,7 +43,7 @@ Demonstrates a TSOA based service using OpenTelemetry.
 
 Demonstrates an pure express based service using OpenTelemetry.  
 
-[README.md](./03_simple_expresss/README.md)  
+[README.md](./03_simple_express/README.md)  
 
 ## 04 - Buildevents opentelemetry
 

@@ -5,7 +5,6 @@ NOTE: Requires a free tier account in Honeycomb.
 
 TODO:
 
-* Express and TSOA (not working)
 * Metrics
 * Mongo
 * Knex or Prisma

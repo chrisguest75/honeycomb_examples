@@ -38,7 +38,7 @@ jobs:
 
     - name: install honeycomb buildevents tool
       run: |
-        curl -L -o /usr/local/bin/buildevents https://github.com/honeycombio/buildevents/releases/latest/download/buildevents-linux-amd64 && chmod 755 /usr/local/bin/buildevents
+        curl -s -L -o /usr/local/bin/buildevents https://github.com/honeycombio/buildevents/releases/latest/download/buildevents-linux-amd64 && chmod 755 /usr/local/bin/buildevents
 
     - name: Create build.json
       run: | 

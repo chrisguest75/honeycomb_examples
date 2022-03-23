@@ -9,7 +9,7 @@ const rootHandler = (_request: Request, response: Response, _next: NextFunction)
   const activeSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   logger.info('rootHandler' + activeSpan)
   activeSpan?.setAttribute('handler', 'rootHandler')
-  response.status(200).json({ message: 'pong' })
+  response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100) })
 }
 
 router.get('/', rootHandler)

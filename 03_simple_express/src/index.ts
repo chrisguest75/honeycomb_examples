@@ -14,6 +14,7 @@ import { logger } from './logger'
 import bodyParser from 'body-parser'
 import { rootRouter } from '../routes/root'
 import { pingRouter } from '../routes/ping'
+import { sleepRouter } from '../routes/sleep'
 
 function shutDown() {
   return new Promise((resolve, reject) => {
@@ -44,6 +45,7 @@ app.use(express.static('public'))
 app.use(pino())
 app.use('/', rootRouter)
 app.use('/ping', pingRouter)
+app.use('/sleep', sleepRouter)
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

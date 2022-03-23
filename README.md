@@ -59,6 +59,7 @@ Demonstrate how to get honeycomb build events working.
 * OTEL JS package [here](https://github.com/open-telemetry/opentelemetry-js)
 * OTEL JS instrumentation packages [here](https://github.com/open-telemetry/opentelemetry-js-contrib)
 * context-async-hooks [here](https://www.npmjs.com/package/@opentelemetry/context-async-hooks)
+* https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/tracing.md
 
 ### Repos
 

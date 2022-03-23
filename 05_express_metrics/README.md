@@ -261,7 +261,6 @@ Follow "OpenTelemetry for JavaScript" [here](https://docs.honeycomb.io/getting-d
 
 ```sh
 npm install --save @grpc/grpc-js
-npm install --save @opentelemetry/api
 npm install --save @opentelemetry/sdk-node
 npm install --save @opentelemetry/exporter-trace-otlp-grpc
 npm install --save @opentelemetry/auto-instrumentations-node

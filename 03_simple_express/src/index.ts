@@ -9,12 +9,14 @@ const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
 configureHoneycomb(apikey, dataset, servicename)
 
 import express from 'express'
+import bodyParser from 'body-parser'
+
 import pino from 'express-pino-logger'
 import { logger } from './logger'
-import bodyParser from 'body-parser'
 import { rootRouter } from '../routes/root'
 import { pingRouter } from '../routes/ping'
 import { sleepRouter } from '../routes/sleep'
+import { fetchRouter } from '../routes/fetch'
 
 function shutDown() {
   return new Promise((resolve, reject) => {
@@ -41,11 +43,14 @@ app.use(
   }),
 )
 app.use(bodyParser.json())
+
+//app.use(express.json())
 app.use(express.static('public'))
 app.use(pino())
 app.use('/', rootRouter)
 app.use('/ping', pingRouter)
 app.use('/sleep', sleepRouter)
+app.use('/fetch', fetchRouter)
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

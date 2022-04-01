@@ -261,7 +261,6 @@ Follow "OpenTelemetry for JavaScript" [here](https://docs.honeycomb.io/getting-d
 
 ```sh
 npm install --save @grpc/grpc-js
-npm install --save @opentelemetry/api
 npm install --save @opentelemetry/sdk-node
 npm install --save @opentelemetry/exporter-trace-otlp-grpc
 npm install --save @opentelemetry/auto-instrumentations-node
@@ -277,14 +276,12 @@ npm run start:dev
 
 ## Resources
 
-* How to Setup a TypeScript + Node.js Project [node-starter-project](https://khalilstemmler.com/blogs/typescript/node-starter-project/)  
-* How to use ESLint with TypeScript [eslint-for-typescript](https://khalilstemmler.com/blogs/typescript/eslint-for-typescript/)  
-* OpenTelemetry for JavaScript [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)  
-* Step 2: Instrument Your Application to Send Telemetry Data to Honeycomb [here](https://docs.honeycomb.io/getting-started/quickstart/#step-2-instrument-your-application-to-send-telemetry-data-to-honeycomb)
-* Service Instrumentation: The Basic Concepts [here](https://logz.io/learn/opentelemetry-guide/#concepts)
-* lightstep/opentelemetry-examples repo [here](https://github.com/lightstep/opentelemetry-examples/tree/main/nodejs)
-* Create spans [here](https://opentelemetry.io/docs/instrumentation/js/instrumentation/#create-spans)
-* OpenTelemetry JavaScript Tracing API Documentation [here](https://opentelemetry.io/docs/instrumentation/js/api/tracing/)
-* OpenTelemetry for NodeJS: All you need to know about tracing [here](https://medium.com/@tedsuo/opentelemetry-nodejs-all-you-need-to-know-a4e1c8f2f93)
-* axios/axios repo [here](https://github.com/axios/axios)
-* Cat Facts API Documentation [here](https://alexwohlbruck.github.io/cat-facts/docs/)
+https://github.com/jest-community/awesome-jest
+https://github.com/facebook/jest/issues/11295
+
+https://blog.sentry.io/2021/07/27/instrumenting-our-frontend-test-suite-and-fixing-what-we-found
+
+https://github.com/FauxFaux/jest-otel/blob/master/src/fun-runtime.js
+
+https://github.com/FauxFaux/jest-otel/tree/master/test
+

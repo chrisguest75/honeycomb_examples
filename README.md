@@ -5,6 +5,7 @@ NOTE: Requires a free tier account in Honeycomb.
 
 TODO:
 
+* Simplify the buildevents boilerplate
 * Jest & Cypress
 * Metrics
 * Mongo
@@ -51,6 +52,12 @@ Demonstrates an pure express based service using OpenTelemetry.
 Demonstrate how to get honeycomb build events working.  
 
 [README.md](./04_buildevents/README.md)  
+
+## 07 - Lambda typescript opentelemetry
+
+Demonstrate how to use serverless framework to deploy a typescript function with Open Telemetry.  
+
+[README.md](./07_lambda_typescript_opentelemetry/README.md)  
 
 ## Resources
 

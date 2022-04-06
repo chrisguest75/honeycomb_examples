@@ -32,13 +32,7 @@ npx sls deploy
 npx sls remove
 ```
 
-## Errors at compile time
-
-```sh
-  # add following to src/functions/hello/handler.ts
-  const x: number = 0;
-  const y: dummy;
-```
+## Build only
 
 ```sh
 npx sls package 
@@ -46,4 +40,5 @@ npx sls package
 
 ## Resources
 
-* building-serverless-app-typescript [here](https://blog.logrocket.com/building-serverless-app-typescript/)
+* building-serverless-app-typescript [here](https://blog.logrocket.com/building-serverless-app-typescript/)  
+* AWS Lambda Instrumentation [here](https://docs.honeycomb.io/getting-data-in/integrations/aws/aws-lambda/)  

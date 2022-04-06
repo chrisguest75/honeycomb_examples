@@ -42,3 +42,4 @@ npx sls package
 
 * building-serverless-app-typescript [here](https://blog.logrocket.com/building-serverless-app-typescript/)  
 * AWS Lambda Instrumentation [here](https://docs.honeycomb.io/getting-data-in/integrations/aws/aws-lambda/)  
+* AWS Distro for OpenTelemetry Lambda [here](https://aws-otel.github.io/docs/getting-started/lambda)  

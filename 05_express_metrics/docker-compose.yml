@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+    # prometheus:
+    #     image: prom/prometheus
+    #     ports:
+    #         - "9090:9090"  
+    #     volumes:
+    #         - "prometheus-data-volume:/prometheus"
+    #         - "./prometheus.yml:/etc/prometheus/prometheus.yml"  
+    #         - "./custom-targets.json:/etc/prometheus/custom-targets.json"                                
+    #     deploy:
+    #         restart_policy:
+    #             condition: on-failure
+    #     networks:
+    #         - overlay                
+
+    server:
+        build: 
+            context: ./server
+            dockerfile: Dockerfile
+        env_file: ./server/.env
+        ports:
+            - "8080:8000"             
+        deploy:
+            restart_policy:
+                condition: on-failure
+
+        networks:
+            - overlay  
+
+networks:
+    overlay:        
+
+volumes:
+    prometheus-data-volume:

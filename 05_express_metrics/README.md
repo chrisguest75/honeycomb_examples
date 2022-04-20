@@ -13,6 +13,17 @@ npm run test
 npm run lint
 ```
 
+### Using compose
+
+```sh
+docker compose up -d 
+
+curl 0.0.0.0:8080            
+docker compose logs server 
+
+docker compose down 
+```
+
 ## How to recreate
 
 Create folder  
@@ -254,7 +265,6 @@ code .
 
 The code should break on the breakpoint.  
 
-
 ## Integrate Honeycomb
 
 Follow "OpenTelemetry for JavaScript" [here](https://docs.honeycomb.io/getting-data-in/javascript/opentelemetry/)
@@ -274,8 +284,6 @@ Copy the `./.env.template` to `./.env` and get APIKEY from [honeycomb account](h
 npm run start:dev
 ```
 
-
-
 ## Resources
 
 * https://www.split.io/blog/node-js-typescript-express-tutorial/
@@ -286,3 +294,5 @@ Host Metrics https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-col
 App Metrics with OTel SDKs - https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/
 
 https://www.npmjs.com/package/@opentelemetry/metrics
+
+https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo

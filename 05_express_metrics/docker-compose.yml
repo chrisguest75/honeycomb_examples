@@ -20,16 +20,23 @@ services:
             dockerfile: Dockerfile
         env_file: ./server/.env
         ports:
-            - "8080:8000"             
+            - "8080:8000"   
         deploy:
             restart_policy:
                 condition: on-failure
 
         networks:
-            - overlay  
+            - service_bridge  
+
+    ubuntu:
+        build: 
+            context: ./ubuntu
+            dockerfile: Dockerfile
+        #entrypoint: "sleep"
+        command: "3000"
+        networks:
+            - service_bridge
 
 networks:
-    overlay:        
-
-volumes:
-    prometheus-data-volume:
+    service_bridge:
+        driver: bridge

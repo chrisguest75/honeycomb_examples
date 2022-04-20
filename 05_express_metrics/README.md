@@ -281,3 +281,8 @@ npm run start:dev
 * https://www.split.io/blog/node-js-typescript-express-tutorial/
 
 
+Metrics Overview https://docs.honeycomb.io/getting-data-in/metrics/
+Host Metrics https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-collector-host-metrics/
+App Metrics with OTel SDKs - https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/
+
+https://www.npmjs.com/package/@opentelemetry/metrics

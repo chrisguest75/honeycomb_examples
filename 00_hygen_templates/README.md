@@ -4,6 +4,11 @@ Use `hygen` to quickly spin up a project using OpenTelemetry
 
 Taken from [20_hygen](https://github.com/chrisguest75/typescript_examples/blob/master/20_hygen/README.md)  
 
+TODO:
+
+* Add an include dockerfile flag
+* Add logger to default cli
+
 ## Usage
 
 ```sh

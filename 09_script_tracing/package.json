@@ -21,6 +21,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^27.0.3",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^17.0.0",
     "@types/pino": "^7.0.5",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
@@ -53,8 +54,9 @@
     "@opentelemetry/auto-instrumentations-node": "^0.28.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.27.0",
     "@opentelemetry/sdk-node": "^0.27.0",
-    "dotenv": "^16.0.0",    
-    "pino": "^7.10.0",    
+    "dotenv": "^16.0.0",
+    "minimist": "^1.2.6",
+    "pino": "^7.10.0",
     "typedoc": "^0.22.13"
   }
 }

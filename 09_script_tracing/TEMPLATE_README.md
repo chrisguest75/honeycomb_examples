@@ -2,6 +2,11 @@
 
 Demonstrates 09_script_tracing
 
+TODO:
+
+* Pass in traceid, parentid.
+* Pass in events and attributes to set on trace.  
+
 ## How to run
 
 ```sh

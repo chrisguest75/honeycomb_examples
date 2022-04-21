@@ -1,3 +1,4 @@
+import minimist from 'minimist'
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
@@ -7,7 +8,9 @@ import * as dotenv from 'dotenv'
 const tracerName = 'default'
 const tracer = opentelemetry.trace.getTracer(tracerName)
 
-export async function main(): Promise<string> {
+export async function main(args: minimist.ParsedArgs): Promise<string> {
+  logger.debug('enter main:' + args._)
+
   // configure honeycomb
   const apikey = process.env.HONEYCOMB_APIKEY ?? ''
   const dataset = process.env.HONEYCOMB_DATASET ?? ''
@@ -51,8 +54,19 @@ export async function main(): Promise<string> {
 
 // load config
 dotenv.config()
+const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
+  string: ['banner', 'font', 'width', 'height'], // --banner "builder" --font "tcb"
+  boolean: ['jp2a', 'verbose', 'clip', 'list'],
+  //alias: { v: 'version' }
+})
+if (args['verbose']) {
+  logger.level = 'debug'
+} else {
+  logger.level = 'error'
+}
+logger.info(args)
 
-main()
+main(args)
   .then(() => {
     process.exit(0)
   })
@@ -60,5 +74,3 @@ main()
     logger.error(e)
     process.exit(1)
   })
-
-

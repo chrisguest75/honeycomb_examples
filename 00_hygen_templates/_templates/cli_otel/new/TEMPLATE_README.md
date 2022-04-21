@@ -10,7 +10,11 @@ Demonstrates <%= name %>
 ```sh
 nvm use
 npm install
+```
 
+Open `./.env` and set APIKEY from [honeycomb account](https://ui.honeycomb.io/account)  
+
+```sh
 # run targets
 npm run start:dev
 npm run test

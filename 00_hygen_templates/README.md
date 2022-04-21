@@ -14,6 +14,9 @@ TODO:
 ```sh
 # create new typescript project with no otel
 npx hygen cli_no_otel new 99_test
+
+# create new typescript project with otel enabled
+npx hygen cli_otel new 99_test
 ```
 
 ```sh

@@ -14,7 +14,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "example": "npm run clean && npm run build && ./run-test.sh"
+
   },
   "keywords": [],
   "author": "",

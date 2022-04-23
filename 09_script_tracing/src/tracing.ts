@@ -61,11 +61,11 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     .start()
     .then(() => {
       logger.info('Tracing initialized')
-      const activeSpan = opentelemetry.trace
-        .getTracer(servicename)
-        .startSpan('init', undefined, opentelemetry.context.active())
-      activeSpan?.addEvent('Tracing initialized', {})
-      activeSpan?.end()
+      // const activeSpan = opentelemetry.trace
+      //   .getTracer(servicename)
+      //   .startSpan('init', undefined, opentelemetry.context.active())
+      // activeSpan?.addEvent('Tracing initialized', {})
+      // activeSpan?.end()
     })
     .catch((error: Error) => logger.error('Error initializing tracing', error))
 

@@ -5,9 +5,12 @@ import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 
 // tracer for the file
-const tracerName = 'default'
-const tracer = opentelemetry.trace.getTracer(tracerName)
+//const tracerName = 'default'
+//const tracer = opentelemetry.trace.getTracer(tracerName)
 
+/***
+ * main
+ */
 export async function main(args: minimist.ParsedArgs): Promise<string> {
   logger.debug('enter main:' + args._)
 
@@ -17,27 +20,49 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
   const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
   await configureHoneycomb(apikey, dataset, servicename)
 
-  // Create the root span for app
-  const activeSpan = tracer.startSpan('main')
-  if (activeSpan == undefined) {
-    logger.error('No active span')
+  const tracerName = 'default'
+  const tracer = opentelemetry.trace.getTracer(tracerName)
+
+  if (args.root) {
+    // Create the root span for app
+    const activeSpan = tracer.startSpan(args.name)
+    if (activeSpan == undefined) {
+      logger.error('No active span')
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore:
+    const trace = { traceid: activeSpan._spanContext.traceId, spanid: activeSpan._spanContext.spanid }
+    logger.info(trace)
+  } else {
+    logger.warn('Skipping root')
   }
-  // set parent span
-  opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
 
-  activeSpan?.setAttribute('pino', `${logger.version}`)
-  logger.info(`Pino:${logger.version}`)
-  activeSpan?.addEvent(`Starting main`)
+  if (args.step) {
+    const trace = { traceid: args.traceid }
+    const activeSpan = tracer.startSpan(args.name)
+    if (activeSpan == undefined) {
+      logger.error('No active span')
+    }
+  } else {
+    logger.warn('Skipping step')
+  }
 
-  // create a span in the loop
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
-  const workSpan = tracer.startSpan('doSomeWork', undefined, ctx)
+  // // set parent span
+  // opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
 
-  //do some stuff
+  // activeSpan?.setAttribute('pino', `${logger.version}`)
+  // logger.info(`Pino:${logger.version}`)
+  // activeSpan?.addEvent(`Starting main`)
 
-  workSpan?.end()
+  // // create a span in the loop
+  // const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+  // const workSpan = tracer.startSpan('doSomeWork', undefined, ctx)
 
-  activeSpan?.end()
+  // //do some stuff
+
+  // workSpan?.end()
+
+  // activeSpan?.end()
 
   return new Promise((resolve, reject) => {
     logger.info('Attempting shutdown')
@@ -55,8 +80,8 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
 // load config
 dotenv.config()
 const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
-  string: ['banner', 'font', 'width', 'height'], // --banner "builder" --font "tcb"
-  boolean: ['jp2a', 'verbose', 'clip', 'list'],
+  string: ['traceid', 'name'], // --traceid "builder" --name "tcb"
+  boolean: ['root', 'step'],
   //alias: { v: 'version' }
 })
 if (args['verbose']) {

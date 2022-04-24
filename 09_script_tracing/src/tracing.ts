@@ -8,19 +8,52 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { IdGenerator, RandomIdGenerator } from '@opentelemetry/core'
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base'
 
 const metadata = new Metadata()
-let sdk: any = null
+let sdk: NodeSDK | null = null
+class HardCodedGenerator implements IdGenerator {
+  private _traceId: string
+  private _spanId: string
+
+  constructor(traceId: string, spanId: string) {
+    this._traceId = traceId
+    this._spanId = spanId
+  }
+
+  /**
+   * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
+   * characters corresponding to 128 bits.
+   */
+  public generateTraceId() {
+    return this._traceId
+  }
+  /**
+   * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
+   * characters corresponding to 64 bits.
+   */
+  public generateSpanId() {
+    const idgen = new RandomIdGenerator()
+    return idgen.generateSpanId()
+  }
+}
 
 export async function shutdownHoneycomb() {
   logger.info('shutdownHoneycomb')
   await sdk
-    .shutdown()
+    ?.shutdown()
     .then(() => logger.info('Tracing terminated'))
     .catch((error: Error) => logger.error('Error terminating tracing', error))
 }
 
-export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
+export async function configureHoneycomb(
+  apikey: string,
+  dataset: string,
+  servicename: string,
+  traceId = '',
+  spanId = '',
+) {
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
   if (enableDiag.toLowerCase() == 'true') {
@@ -39,26 +72,28 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
 
   sdk = new NodeSDK({
+    //spanProcessor: new SimpleSpanProcessor(traceExporter),
+    autoDetectResources: false,
     resource: new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: servicename,
       [SemanticResourceAttributes.SERVICE_VERSION]: serviceversion,
     }),
     traceExporter,
-    instrumentations: [
-      getNodeAutoInstrumentations({
-        // load custom configuration for http instrumentation
-        '@opentelemetry/instrumentation-http': {
-          applyCustomAttributesOnSpan: (span) => {
-            span.setAttribute('instrumentation-http', 'true')
-          },
-        },
-      }),
-      new HttpInstrumentation(),
-    ],
+    instrumentations: [],
   })
+  if (traceId != '') {
+    sdk?.configureTracerProvider(
+      { idGenerator: new HardCodedGenerator(traceId, spanId) },
+      new BatchSpanProcessor(traceExporter),
+    )
+  }
+
+  /*if (traceId != '') {
+    sdk.idGenerator = new HardCodedGenerator(traceId, spanId)
+  }*/
 
   await sdk
-    .start()
+    ?.start()
     .then(() => {
       logger.info('Tracing initialized')
       // const activeSpan = opentelemetry.trace

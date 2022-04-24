@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${file}",
-            "args": ["--root"]
+            "args": []
 
         }
     ]

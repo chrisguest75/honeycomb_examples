@@ -18,7 +18,7 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
   const apikey = process.env.HONEYCOMB_APIKEY ?? ''
   const dataset = process.env.HONEYCOMB_DATASET ?? ''
   const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
-  await configureHoneycomb(apikey, dataset, servicename)
+  await configureHoneycomb(apikey, dataset, servicename, args.traceid, args.spanid)
 
   const tracerName = 'default'
   const tracer = opentelemetry.trace.getTracer(tracerName)
@@ -63,12 +63,14 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
 
   if (args.step) {
     // TODO: Need to convert the passed in traceid and spanid into the core trace
-    const trace = { traceId: args.traceid, spanId: args.spanid }
-    logger.info(trace)
+    const inputtrace = { traceId: args.traceid, spanId: args.spanid }
+    logger.info(inputtrace)
     const activeSpan = tracer.startSpan(args.name)
     if (activeSpan == undefined) {
       logger.error('No active span')
     }
+    const trace = { traceId: activeSpan.spanContext().traceId, spanId: activeSpan.spanContext().spanId }
+    logger.info(trace)
     activeSpan?.end()
   } else {
     logger.warn('Skipping step')

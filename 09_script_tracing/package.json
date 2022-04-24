@@ -15,8 +15,8 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "example": "npm run clean && npm run build && ./run-test.sh"
-
+    "example:root": "npm run rebuild && ./run-test-root.sh",
+    "example:step": "npm run rebuild && ./run-test-step.sh"
   },
   "keywords": [],
   "author": "",
@@ -48,7 +48,7 @@
     ],
     "ext": "ts",
     "ignore": [],
-    "exec": "ts-node ./src/index.ts"
+    "exec": "ts-node --emit ./src/index.ts --root"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.6.7",

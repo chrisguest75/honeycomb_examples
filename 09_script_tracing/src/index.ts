@@ -31,14 +31,17 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore:
-    const trace = { traceid: activeSpan._spanContext.traceId, spanid: activeSpan._spanContext.spanid }
+    const trace = { traceId: activeSpan._spanContext.traceId, spanId: activeSpan._spanContext.spanId }
     logger.info(trace)
+    activeSpan?.end()
   } else {
     logger.warn('Skipping root')
   }
 
   if (args.step) {
-    const trace = { traceid: args.traceid }
+    // TODO: Need to convert the passed in traceid and spanid into the core trace
+    const trace = { traceid: args.traceid, spanid: args.spanid }
+    logger.info(trace)
     const activeSpan = tracer.startSpan(args.name)
     if (activeSpan == undefined) {
       logger.error('No active span')
@@ -78,24 +81,30 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
 }
 
 // load config
+logger.debug('load configuration')
 dotenv.config()
+logger.debug('process arguments')
 const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
-  string: ['traceid', 'name'], // --traceid "builder" --name "tcb"
+  string: ['traceid', 'spanid', 'name'], // --traceid "xxxxxxxx" --name "tcb"
   boolean: ['root', 'step'],
   //alias: { v: 'version' }
 })
+logger.debug('processed arguments')
 if (args['verbose']) {
   logger.level = 'debug'
 } else {
-  logger.level = 'error'
+  logger.level = 'info'
 }
-logger.info(args)
+//logger.debug('args')
+//logger.info(args)
 
 main(args)
   .then(() => {
+    logger.info('exit 0')
     process.exit(0)
   })
   .catch((e) => {
+    logger.info('exit 1')
     logger.error(e)
     process.exit(1)
   })

@@ -16,6 +16,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "example:root": "npm run rebuild && ./run-test-root.sh",
+    "example:link": "npm run rebuild && ./run-test-link.sh",
     "example:step": "npm run rebuild && ./run-test-step.sh"
   },
   "keywords": [],

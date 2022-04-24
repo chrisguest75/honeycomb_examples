@@ -1,7 +1,7 @@
 import minimist from 'minimist'
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
+import opentelemetry, { Span, SpanKind, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 
 // tracer for the file
@@ -29,26 +29,51 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
     if (activeSpan == undefined) {
       logger.error('No active span')
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore:
-    const trace = { traceId: activeSpan._spanContext.traceId, spanId: activeSpan._spanContext.spanId }
+    const trace = { traceId: activeSpan.spanContext().traceId, spanId: activeSpan.spanContext().spanId }
     logger.info(trace)
     activeSpan?.end()
   } else {
     logger.warn('Skipping root')
   }
 
+  // add a link to a trace.
+  if (args.link) {
+    const trace = { traceId: args.traceid, spanId: args.spanid }
+    logger.info(trace)
+    const activeSpan = tracer.startSpan(args.name, {
+      kind: SpanKind.SERVER,
+      links: [
+        {
+          context: {
+            traceId: trace.traceId,
+            spanId: trace.spanId,
+            traceFlags: 1,
+            traceState: undefined,
+          },
+        },
+      ],
+    })
+    if (activeSpan == undefined) {
+      logger.error('No active span')
+    }
+    activeSpan?.end()
+  } else {
+    logger.warn('Skipping link')
+  }
+
   if (args.step) {
     // TODO: Need to convert the passed in traceid and spanid into the core trace
-    const trace = { traceid: args.traceid, spanid: args.spanid }
+    const trace = { traceId: args.traceid, spanId: args.spanid }
     logger.info(trace)
     const activeSpan = tracer.startSpan(args.name)
     if (activeSpan == undefined) {
       logger.error('No active span')
     }
+    activeSpan?.end()
   } else {
     logger.warn('Skipping step')
   }
+
 
   // // set parent span
   // opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
@@ -86,7 +111,7 @@ dotenv.config()
 logger.debug('process arguments')
 const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
   string: ['traceid', 'spanid', 'name'], // --traceid "xxxxxxxx" --name "tcb"
-  boolean: ['root', 'step'],
+  boolean: ['root', 'step', 'link'],
   //alias: { v: 'version' }
 })
 logger.debug('processed arguments')

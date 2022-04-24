@@ -7,6 +7,11 @@ TODO:
 * Pass in traceid, parentid.
 * Pass in events and attributes to set on trace.  
 
+Thoughts:
+
+* Difference between setSpan and startSpan?
+
+
 ## How to run
 
 ```sh
@@ -52,3 +57,4 @@ The code should break on the breakpoint.
 ## Resources
 
 * My basic typecript cmdline [01_basic_cmdline](https://github.com/chrisguest75/typescript_examples/tree/master/01_basic_cmdline)
+* [Tracing API](https://opentelemetry.io/docs/reference/specification/trace/api/)

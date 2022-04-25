@@ -16,26 +16,30 @@ let sdk: NodeSDK | null = null
 class HardCodedGenerator implements IdGenerator {
   private _traceId: string
   private _spanId: string
+  private _idgen: IdGenerator
 
   constructor(traceId: string, spanId: string) {
     this._traceId = traceId
     this._spanId = spanId
+    this._idgen = new RandomIdGenerator()
   }
 
-  /**
-   * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
-   * characters corresponding to 128 bits.
-   */
   public generateTraceId() {
-    return this._traceId
+    if (this._traceId == '') {
+      return this._idgen.generateTraceId()
+    } else {
+      return this._traceId
+    }
   }
-  /**
-   * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
-   * characters corresponding to 64 bits.
-   */
+
   public generateSpanId() {
-    const idgen = new RandomIdGenerator()
-    return idgen.generateSpanId()
+    if (this._spanId == '') {
+      return this._idgen.generateSpanId()
+    } else {
+      return this._spanId
+    }
+
+    return this._idgen.generateSpanId()
   }
 }
 
@@ -81,16 +85,14 @@ export async function configureHoneycomb(
     traceExporter,
     instrumentations: [],
   })
+
   if (traceId != '') {
+    // override with custom generator
     sdk?.configureTracerProvider(
       { idGenerator: new HardCodedGenerator(traceId, spanId) },
       new BatchSpanProcessor(traceExporter),
     )
   }
-
-  /*if (traceId != '') {
-    sdk.idGenerator = new HardCodedGenerator(traceId, spanId)
-  }*/
 
   await sdk
     ?.start()

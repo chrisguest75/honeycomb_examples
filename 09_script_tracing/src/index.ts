@@ -3,6 +3,7 @@ import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry, { Span, SpanKind, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
+import { writeFileSync, readFileSync } from 'fs'
 
 // tracer for the file
 //const tracerName = 'default'
@@ -32,6 +33,8 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
     const trace = { traceId: activeSpan.spanContext().traceId, spanId: activeSpan.spanContext().spanId }
     logger.info(trace)
     activeSpan?.end()
+
+    writeFileSync(args.out, JSON.stringify(trace))
   } else {
     logger.warn('Skipping root')
   }
@@ -62,7 +65,7 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
   }
 
   if (args.step) {
-    // TODO: Need to convert the passed in traceid and spanid into the core trace
+    // convert the passed in traceid and spanid into the core trace
     const inputtrace = { traceId: args.traceid, spanId: args.spanid }
     logger.info(inputtrace)
     const activeSpan = tracer.startSpan(args.name)
@@ -75,24 +78,6 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
   } else {
     logger.warn('Skipping step')
   }
-
-
-  // // set parent span
-  // opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
-
-  // activeSpan?.setAttribute('pino', `${logger.version}`)
-  // logger.info(`Pino:${logger.version}`)
-  // activeSpan?.addEvent(`Starting main`)
-
-  // // create a span in the loop
-  // const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
-  // const workSpan = tracer.startSpan('doSomeWork', undefined, ctx)
-
-  // //do some stuff
-
-  // workSpan?.end()
-
-  // activeSpan?.end()
 
   return new Promise((resolve, reject) => {
     logger.info('Attempting shutdown')
@@ -112,7 +97,7 @@ logger.debug('load configuration')
 dotenv.config()
 logger.debug('process arguments')
 const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
-  string: ['traceid', 'spanid', 'name'], // --traceid "xxxxxxxx" --name "tcb"
+  string: ['traceid', 'spanid', 'name', 'out', 'in'], // --traceid "xxxxxxxx" --name "tcb"
   boolean: ['root', 'step', 'link'],
   //alias: { v: 'version' }
 })

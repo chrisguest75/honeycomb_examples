@@ -23,6 +23,9 @@ TODO:
 * `Context Handler`
 * `Semantic Attributes` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
 * `Instrumentation`
+* `Exporter` 
+* `SpanProcessor`
+* `IdGenerator` spans and trace ids are generated using an internal generator.
 
 TODO: 
 

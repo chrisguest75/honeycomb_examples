@@ -38,8 +38,6 @@ class HardCodedGenerator implements IdGenerator {
     } else {
       return this._spanId
     }
-
-    return this._idgen.generateSpanId()
   }
 }
 
@@ -86,13 +84,11 @@ export async function configureHoneycomb(
     instrumentations: [],
   })
 
-  if (traceId != '') {
-    // override with custom generator
-    sdk?.configureTracerProvider(
-      { idGenerator: new HardCodedGenerator(traceId, spanId) },
-      new BatchSpanProcessor(traceExporter),
-    )
-  }
+  // override with custom generator
+  sdk?.configureTracerProvider(
+    { idGenerator: new HardCodedGenerator(traceId, spanId) },
+    new BatchSpanProcessor(traceExporter),
+  )
 
   await sdk
     ?.start()

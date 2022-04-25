@@ -4,8 +4,9 @@ Demonstrates 09_script_tracing
 
 TODO:
 
-* Pass in traceid, parentid.
-* Pass in events and attributes to set on trace.  
+* Pass in events and attributes to set on trace (this can be done in json).  
+* Set the time for spans.
+* Set child spans using passed in spanid to generate a parent
 
 Thoughts:
 
@@ -17,6 +18,9 @@ Thoughts:
 ```sh
 nvm use
 npm install
+
+# run an example trace
+npm run example:trace         
 ```
 
 Open `./.env` and set APIKEY from [honeycomb account](https://ui.honeycomb.io/account)  

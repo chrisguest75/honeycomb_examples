@@ -25,22 +25,60 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
   const tracer = opentelemetry.trace.getTracer(tracerName)
 
   if (args.root) {
+    logger.info('Processing root')
     // Create the root span for app
     const activeSpan = tracer.startSpan(args.name)
     if (activeSpan == undefined) {
       logger.error('No active span')
     }
-    const trace = { traceId: activeSpan.spanContext().traceId, spanId: activeSpan.spanContext().spanId }
+    const trace = {
+      traceId: activeSpan.spanContext().traceId,
+      spanId: activeSpan.spanContext().spanId,
+      name: args.name,
+    }
     logger.info(trace)
     activeSpan?.end()
 
-    writeFileSync(args.out, JSON.stringify(trace))
+    if (args['out']) {
+      logger.info('Writing ' + args.out)
+      writeFileSync(args.out, JSON.stringify(trace))
+    } else {
+      logger.debug('Skip writing file')
+    }
   } else {
     logger.warn('Skipping root')
   }
 
+  if (args.step) {
+    logger.info('Processing step')
+    // convert the passed in traceid and spanid into the core trace
+    const inputtrace = { traceId: args.traceid, spanId: args.spanid }
+    logger.info(inputtrace)
+    const activeSpan = tracer.startSpan(args.name)
+    if (activeSpan == undefined) {
+      logger.error('No active span')
+    }
+    const trace = {
+      traceId: activeSpan.spanContext().traceId,
+      spanId: activeSpan.spanContext().spanId,
+      name: args.name,
+    }
+    logger.info(trace)
+    activeSpan?.end()
+
+    if (args['out']) {
+      logger.info('Writing ' + args.out)
+      writeFileSync(args.out, JSON.stringify(trace))
+    } else {
+      logger.debug('Skip writing file')
+    }
+  } else {
+    logger.warn('Skipping step')
+  }
+
   // add a link to a trace.
   if (args.link) {
+    logger.info('Processing link')
     const trace = { traceId: args.traceid, spanId: args.spanid }
     logger.info(trace)
     const activeSpan = tracer.startSpan(args.name, {
@@ -64,21 +102,6 @@ export async function main(args: minimist.ParsedArgs): Promise<string> {
     logger.warn('Skipping link')
   }
 
-  if (args.step) {
-    // convert the passed in traceid and spanid into the core trace
-    const inputtrace = { traceId: args.traceid, spanId: args.spanid }
-    logger.info(inputtrace)
-    const activeSpan = tracer.startSpan(args.name)
-    if (activeSpan == undefined) {
-      logger.error('No active span')
-    }
-    const trace = { traceId: activeSpan.spanContext().traceId, spanId: activeSpan.spanContext().spanId }
-    logger.info(trace)
-    activeSpan?.end()
-  } else {
-    logger.warn('Skipping step')
-  }
-
   return new Promise((resolve, reject) => {
     logger.info('Attempting shutdown')
     shutdownHoneycomb()
@@ -98,7 +121,7 @@ dotenv.config()
 logger.debug('process arguments')
 const args: minimist.ParsedArgs = minimist(process.argv.slice(2), {
   string: ['traceid', 'spanid', 'name', 'out', 'in'], // --traceid "xxxxxxxx" --name "tcb"
-  boolean: ['root', 'step', 'link'],
+  boolean: ['verbose', 'root', 'step', 'link', 'event'],
   //alias: { v: 'version' }
 })
 logger.debug('processed arguments')

@@ -26,8 +26,11 @@ TODO:
 * `Exporter` 
 * `SpanProcessor`
 * `IdGenerator` spans and trace ids are generated using an internal generator.
+* `PropagationAPI`
+* `Baggage`
+* `Links`
 
-TODO: 
+TODO:
 
 * create client
 

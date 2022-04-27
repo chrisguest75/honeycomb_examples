@@ -1,6 +1,6 @@
 # README
 
-Demonstrates 09_script_tracing
+Demonstrates 09_script_tracing_node_tool
 
 TODO:
 

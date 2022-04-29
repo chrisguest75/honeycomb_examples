@@ -70,3 +70,8 @@ https://github.com/mnadeem/nodejs-opentelemetry-tempo
 
 
 https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
+
+
+
+https://open-telemetry.github.io/opentelemetry-js/modules.html
+

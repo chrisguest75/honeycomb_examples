@@ -3,6 +3,9 @@ import { configureHoneycomb, shutdownHoneycomb } from './tracing'
 import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 
+// load config
+dotenv.config()
+
 // tracer for the file
 const tracerName = 'default'
 const tracer = opentelemetry.trace.getTracer(tracerName)
@@ -48,9 +51,6 @@ export async function main(): Promise<string> {
       })
   })
 }
-
-// load config
-dotenv.config()
 
 main()
   .then(() => {

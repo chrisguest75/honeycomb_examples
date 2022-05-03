@@ -1,6 +1,6 @@
 # README
 
-Demonstrates 99_workshop_example
+Demonstrates 06_opentelemetry_collector  
 
 ## How to run
 

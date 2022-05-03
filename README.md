@@ -12,6 +12,7 @@ TODO:
 * Knex or Prisma
 * Redis
 * Propagation
+* Refinery
 
 ## Glossary
 

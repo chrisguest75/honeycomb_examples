@@ -32,9 +32,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   metadata.set('x-honeycomb-team', apikey)
   //metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({
-    url: endpoint,
-    credentials: credentials.createSsl(),
-    metadata,
+    //url: endpoint,
+    //credentials: credentials.createSsl(),
+    //metadata,
   })
 
   const serviceversion = process.env.SERVICE_VERSION ?? 'unset'

@@ -12,6 +12,14 @@ docker compose up -d --build --force-recreate
 
 # show logs for agent
 docker compose logs --no-log-prefix otel-collector -f     
+
+
+
+docker run \
+  -p 14268:14268 \
+  -p 4317-4318:4317-4318 \
+  -v $(pwd)/otel-collector-config.yaml:/etc/otel/config.yaml \
+  otel/opentelemetry-collector-contrib:latest
 ```
 
 ## Send trace

@@ -17,7 +17,7 @@ docker compose logs --no-log-prefix otel-collector
 
 
 export OTEL_EXPORTER_OTLP_ENDPOINT=0.0.0.0:4317 
-otel-cli exec --service my-service --name "curl google" curl https://google.com
+otel-cli exec --verbose --tp-print --insecure true --service my-service --name "curl google" curl https://google.com
 
 
 docker compose down              

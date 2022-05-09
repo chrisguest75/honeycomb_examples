@@ -19,7 +19,7 @@ docker run \
   -p 14268:14268 \
   -p 4317-4318:4317-4318 \
   -v $(pwd)/otel-collector-config.yaml:/etc/otel/config.yaml \
-  otel/opentelemetry-collector-contrib:latest
+  otel/opentelemetry-collector-contrib:0.50.0
 ```
 
 ## Send trace
@@ -46,4 +46,9 @@ https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exam
 https://docs.honeycomb.io/getting-data-in/otel-collector/
 
 https://opentelemetry.io/docs/collector/configuration/
+
+
+https://github.com/open-telemetry/opentelemetry-collector-contrib
+
+https://hub.docker.com/r/otel/opentelemetry-collector-contrib/tags
 

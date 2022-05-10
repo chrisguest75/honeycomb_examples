@@ -9,23 +9,19 @@ brew tap equinix-labs/otel-cli
 brew install otel-cli
 ```
 
-NOTE: Use yq to insert keys into the config
+## Run example
 
 ```sh
+# start otel collector
 docker compose up -d --build  
 docker compose logs --no-log-prefix otel-collector           
 
+# run tests
+./test-cli.sh
 
-export OTEL_EXPORTER_OTLP_ENDPOINT=0.0.0.0:4317 
-otel-cli exec --verbose --tp-print --insecure true --service my-service --name "curl google" curl https://google.com
-
-
+# shutdown collector
 docker compose down              
-
-
 ```
-
-
 
 ## Resources
 

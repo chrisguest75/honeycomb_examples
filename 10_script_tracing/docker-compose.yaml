@@ -16,20 +16,6 @@ services:
       networks:
         - service_bridge  
         
-    # server:
-    #     build: 
-    #         context: ./server
-    #         dockerfile: Dockerfile
-    #     env_file: ./server/.env
-    #     ports:
-    #         - "8080:8000"   
-    #     deploy:
-    #         restart_policy:
-    #             condition: on-failure
-
-    #     networks:
-    #         - service_bridge  
-
     # ubuntu:
     #     build: 
     #         context: ./ubuntu

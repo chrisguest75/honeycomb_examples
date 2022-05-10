@@ -2,6 +2,12 @@
 
 Demonstrate using tracing `equinix-labs/otel-cli`  
 
+TODO:
+
+* Is it possible without the collector?
+* Docker image test
+* More complicated test script
+
 ## Prereqs
 
 ```sh
@@ -25,10 +31,8 @@ docker compose down
 
 ## Resources
 
-https://github.com/equinix-labs/otel-cli
+* equinix-labs/otel-cli repo [here](https://github.com/equinix-labs/otel-cli)
+* equinix-labs/otel-cli releases [here](https://github.com/equinix-labs/otel-cli/releases)
+* OpenTelemetry Collector Demo [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo)
+* Honeycomb OpenTelemetry Collector [here](https://docs.honeycomb.io/getting-data-in/otel-collector/)
 
-https://github.com/equinix-labs/otel-cli/releases
-
-https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
-
-https://docs.honeycomb.io/getting-data-in/otel-collector/

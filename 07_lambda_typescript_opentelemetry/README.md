@@ -11,6 +11,13 @@ Help with AWS CLI [here](https://github.com/chrisguest75/shell_examples/blob/mas
 serverless create --template aws-nodejs-typescript     
 ```
 
+## Add pino logging
+
+```sh
+npm install pino     
+npm install --save-dev @types/pino   
+```
+
 ## Local
 
 ```sh

@@ -16,11 +16,26 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-    },
+      AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+      OPENTELEMETRY_COLLECTOR_CONFIG_FILE: '/var/task/otel-collector-config.yaml',
+      OTEL_SERVICE_NAME: '07_lambda_typescript_opentelemetry',
+      // propagators and sampler need to be set if xray disabled
+      OTEL_PROPAGATORS: 'tracecontext',
+      OTEL_TRACES_SAMPLER: 'always_on',      
+    },      
+    layers: [
+      'arn:aws:lambda:us-east-1:901920570463:layer:aws-otel-nodejs-amd64-ver-1-0-1:2'
+    ],
   },
   // import the function via paths
   functions: { hello },
-  package: { individually: true },
+  package: { 
+    individually: true,
+    patterns: [
+      'otel-collector-config.yaml',
+    ] 
+
+  },
   custom: {
     esbuild: {
       bundle: true,

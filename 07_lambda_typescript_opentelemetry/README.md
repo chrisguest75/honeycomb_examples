@@ -68,3 +68,7 @@ npx sls package
 https://github.com/aws-observability/aws-otel-collector
 
 https://aws-otel.github.io/docs/components/otlp-exporter#honeycomb
+
+
+ Issue using aws-otel-nodejs in Lambda
+ https://github.com/aws-observability/aws-otel-lambda/issues/99

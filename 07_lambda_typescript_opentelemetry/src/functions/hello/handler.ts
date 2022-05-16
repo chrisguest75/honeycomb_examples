@@ -11,4 +11,7 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) =
   });
 };
 
-export const main = middyfy(hello);
+// NOTE: https://github.com/aws-observability/aws-otel-lambda/issues/99
+const main = middyfy(hello);
+
+module.exports = { main };

@@ -4,7 +4,13 @@
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "package": "./scripts/lambda.sh --package",
+    "deploy": "./scripts/lambda.sh --deploy",
+    "invoke": "./scripts/lambda.sh --invoke",
+    "logs": "./scripts/lambda.sh --logs",
+    "info": "./scripts/lambda.sh --info",
+    "remove": "./scripts/lambda.sh --remove",
+    "details": "AWS_PAGER= aws --profile $AWS_PROFILE --region $AWS_REGION lambda list-functions --query 'Functions[?starts_with(FunctionName, `AWS07-lambda-typescript-opentelemetry-dev-hello`) == `true`]'"
   },
   "engines": {
     "node": ">=14.15.0"

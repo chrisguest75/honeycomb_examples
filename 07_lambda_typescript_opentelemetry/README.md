@@ -35,38 +35,39 @@ npx sls offline
 aws configure list-profiles  
 
 # configure
-export AWS_PROFILE=
-export AWS_REGION=
+export AWS_PROFILE=the-profile
+export AWS_REGION=us-east-1
 
 # info and deploy
-npx sls info --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose
+npm run info
 
 # deploy
-npx sls deploy --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose
+npm run deploy
 ```
 
 ```sh
 # show functions
-aws --profile $AWS_PROFILE --region "${AWS_REGION}" lambda list-functions | grep open
+npm run details
 
 # invoke test
-npx sls invoke --aws-profile "${AWS_PROFILE}"  --region "${AWS_REGION}" -f hello --path src/functions/hello/mock.json
+npm run invoke
 
 # show logs 
-npx sls logs --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" -f hello 
+npm run logs
 ```
 
 ## Cleanup
 
 ```sh
 # remove the function
-npx sls remove --aws-profile "${AWS_PROFILE}"  --region "${AWS_REGION}" --verbose
+npm run remove
 ```
 
 ## Build only
 
 ```sh
-npx sls package 
+# package code
+npm run package
 ```
 
 ## Resources

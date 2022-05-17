@@ -78,3 +78,11 @@ npx sls package
 * aws-observability/aws-otel-collector repo [here](https://github.com/aws-observability/aws-otel-collector)
 * Honeycomb Config - AWS Distro for OpenTelemetry Lambda [here](https://aws-otel.github.io/docs/components/otlp-exporter#honeycomb)
 * Issue using aws-otel-nodejs in Lambda [here](https://github.com/aws-observability/aws-otel-lambda/issues/99)
+
+
+https://github.com/aws-observability/aws-otel-lambda
+
+https://github.com/open-telemetry/opentelemetry-lambda
+
+https://github.com/open-telemetry/opentelemetry-lambda/blob/main/nodejs/sample-apps/aws-sdk/src/index.ts
+

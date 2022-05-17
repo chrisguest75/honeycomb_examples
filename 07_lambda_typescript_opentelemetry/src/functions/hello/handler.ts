@@ -3,6 +3,7 @@ import { logger } from '@libs/logger'
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
+import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
 
 import schema from './schema';
 
@@ -29,9 +30,21 @@ function sleep(ms: number) {
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   const sleeping = sleep(2000)
 
+  const client = new S3Client({
+    region: 'us-east-1',
+  });
+  const s3response = await client.send(new ListBucketsCommand({}));
+  // eslint-disable-next-line no-console
+  logger.info({
+    function: 'hello',
+    numberOfBuckets: s3response.Buckets?.length,
+  });
+
+
   let response = formatJSONResponse({
     message: `Hello ${event.body.name}, welcome to the exciting Serverless world!`,
     event,
+    numberOfBuckets: s3response.Buckets?.length,
   });
 
   await sleeping

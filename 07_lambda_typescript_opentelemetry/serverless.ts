@@ -21,11 +21,21 @@ const serverlessConfiguration: AWS = {
       OTEL_SERVICE_NAME: '07_lambda_typescript_opentelemetry',
       // propagators and sampler need to be set if xray disabled
       OTEL_PROPAGATORS: 'tracecontext',
-      OTEL_TRACES_SAMPLER: 'always_on',      
+      OTEL_TRACES_SAMPLER: 'always_on',  
+      // equivalant to DiagLogLevel.ALL
+      OTEL_LOG_LEVEL: 'ALL',    
     },      
     layers: [
       'arn:aws:lambda:us-east-1:901920570463:layer:aws-otel-nodejs-amd64-ver-1-0-1:2'
     ],
+    iamRoleStatements: [
+      {
+        'Effect': 'Allow',
+        'Action': ['s3:GetObject', 's3:ListBucket', 's3:ListAllMyBuckets'],
+        'Resource': 'arn:aws:s3:::*'
+      }
+    ]
+
   },
   // import the function via paths
   functions: { hello },

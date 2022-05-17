@@ -11,6 +11,13 @@ Help with AWS CLI [here](https://github.com/chrisguest75/shell_examples/blob/mas
 serverless create --template aws-nodejs-typescript     
 ```
 
+## Add pino logging
+
+```sh
+npm install pino     
+npm install --save-dev @types/pino   
+```
+
 ## Local
 
 ```sh
@@ -28,38 +35,39 @@ npx sls offline
 aws configure list-profiles  
 
 # configure
-export AWS_PROFILE=
-export AWS_REGION=
+export AWS_PROFILE=the-profile
+export AWS_REGION=us-east-1
 
 # info and deploy
-npx sls info --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose
+npm run info
 
 # deploy
-npx sls deploy --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose
+npm run deploy
 ```
 
 ```sh
 # show functions
-aws --profile $AWS_PROFILE --region "${AWS_REGION}" lambda list-functions | grep open
+npm run details
 
 # invoke test
-npx sls invoke --aws-profile "${AWS_PROFILE}"  --region "${AWS_REGION}" -f hello --path src/functions/hello/mock.json
+npm run invoke
 
 # show logs 
-npx sls logs --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" -f hello 
+npm run logs
 ```
 
 ## Cleanup
 
 ```sh
 # remove the function
-npx sls remove --aws-profile "${AWS_PROFILE}"  --region "${AWS_REGION}" --verbose
+npm run remove
 ```
 
 ## Build only
 
 ```sh
-npx sls package 
+# package code
+npm run package
 ```
 
 ## Resources
@@ -71,3 +79,13 @@ npx sls package
 * aws-observability/aws-otel-collector repo [here](https://github.com/aws-observability/aws-otel-collector)
 * Honeycomb Config - AWS Distro for OpenTelemetry Lambda [here](https://aws-otel.github.io/docs/components/otlp-exporter#honeycomb)
 * Issue using aws-otel-nodejs in Lambda [here](https://github.com/aws-observability/aws-otel-lambda/issues/99)
+
+
+https://github.com/aws-observability/aws-otel-lambda
+
+https://github.com/open-telemetry/opentelemetry-lambda
+
+https://github.com/open-telemetry/opentelemetry-lambda/blob/main/nodejs/sample-apps/aws-sdk/src/index.ts
+
+This is the wrapper with the callbacks
+https://github.com/open-telemetry/opentelemetry-lambda/blob/0a83149fe2f23a7dab64df6108cfa35f18cc2ae5/nodejs/packages/layer/src/wrapper.ts

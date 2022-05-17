@@ -4,19 +4,29 @@
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "package": "./scripts/lambda.sh --package",
+    "deploy": "./scripts/lambda.sh --deploy",
+    "invoke": "./scripts/lambda.sh --invoke",
+    "logs": "./scripts/lambda.sh --logs",
+    "info": "./scripts/lambda.sh --info",
+    "remove": "./scripts/lambda.sh --remove",
+    "details": "AWS_PAGER= aws --profile $AWS_PROFILE --region $AWS_REGION lambda list-functions --query 'Functions[?starts_with(FunctionName, `AWS07-lambda-typescript-opentelemetry-dev-hello`) == `true`]'"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.92.0",
     "@middy/core": "^2.5.3",
-    "@middy/http-json-body-parser": "^2.5.3"
+    "@middy/http-json-body-parser": "^2.5.3",
+    "@opentelemetry/api": "^1.1.0",
+    "pino": "^7.11.0"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
     "@types/aws-lambda": "^8.10.71",
     "@types/node": "^14.14.25",
+    "@types/pino": "^7.0.5",
     "esbuild": "^0.14.11",
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^3.0.0",

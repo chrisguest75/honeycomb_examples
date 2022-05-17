@@ -87,3 +87,5 @@ https://github.com/open-telemetry/opentelemetry-lambda
 
 https://github.com/open-telemetry/opentelemetry-lambda/blob/main/nodejs/sample-apps/aws-sdk/src/index.ts
 
+This is the wrapper with the callbacks
+https://github.com/open-telemetry/opentelemetry-lambda/blob/0a83149fe2f23a7dab64df6108cfa35f18cc2ae5/nodejs/packages/layer/src/wrapper.ts

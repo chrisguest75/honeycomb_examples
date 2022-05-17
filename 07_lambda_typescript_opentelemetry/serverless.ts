@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
       OTEL_PROPAGATORS: 'tracecontext',
       OTEL_TRACES_SAMPLER: 'always_on',  
       // equivalant to DiagLogLevel.ALL
-      OTEL_LOG_LEVEL: '9999',    
+      OTEL_LOG_LEVEL: 'ALL',    
     },      
     layers: [
       'arn:aws:lambda:us-east-1:901920570463:layer:aws-otel-nodejs-amd64-ver-1-0-1:2'

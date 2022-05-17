@@ -28,7 +28,7 @@ function sleep(ms: number) {
 
 
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
-  const sleeping = sleep(2000)
+  const sleeping = sleep(1000)
 
   const client = new S3Client({
     region: 'us-east-1',

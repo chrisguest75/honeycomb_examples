@@ -60,6 +60,7 @@ const serverlessConfiguration: AWS = {
   },
   custom: {
     esbuild: {
+      plugins : './plugins.js',
       bundle: true,
       minify: false,
       sourcemap: true,

@@ -8,7 +8,6 @@ TODO:
 
 * Get local working.
 * Build `otel-collector-config.yaml` from template
-* Remove the esbuild bundler for otel.
 * root span is broken
 * Fix the faas version - $LATEST
 * Pull in layer from regional config 

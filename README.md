@@ -25,9 +25,15 @@ TODO:
 * `Semantic Attributes` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
 * `Instrumentation`
 
-TODO: 
+TODO:  
 
 * create client
+
+## 00 - hygen templates
+
+Use hygen to quickly spin up a project using OpenTelemetry  
+
+[README.md](./00_hygen_templates/README.md)  
 
 ## 01 - Basic helloworld opentelemetry
 
@@ -59,6 +65,18 @@ Demonstrate how to use serverless framework to deploy a typescript function with
 
 [README.md](./07_lambda_typescript_opentelemetry/README.md)  
 
+## 11 - Markers
+
+Demonstrate how to use the marker API in honeycomb.  
+
+[README.md](./11_markers/README.md)  
+
+## 13 - Lambda JS OpenTelemetry
+
+Demonstrate how to use serverless framework to deploy a non-bundled node function with Open Telemetry.  
+
+[README.md](./13_lambda_js_opentelemetry/README.md)  
+
 ## Resources
 
 ### Open Telemetry
@@ -67,18 +85,12 @@ Demonstrate how to use serverless framework to deploy a typescript function with
 * OTEL JS package [here](https://github.com/open-telemetry/opentelemetry-js)
 * OTEL JS instrumentation packages [here](https://github.com/open-telemetry/opentelemetry-js-contrib)
 * context-async-hooks [here](https://www.npmjs.com/package/@opentelemetry/context-async-hooks)
-* https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/tracing.md
+* open-telemetry/opentelemetry-js-api repo [here](https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/tracing.md)  
+* Run an OpenTelemetry Collector locally in Docker [here](https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/)  
+* OpenTelemetry SDK [here](https://open-telemetry.github.io/opentelemetry-js/modules.html)  
 
 ### Repos
 
 * workshop-advanced-instrumentation [repo](https://github.com/honeycombio/workshop-advanced-instrumentation)
 * Build Events [here](https://github.com/honeycombio/buildevents)
 https://github.com/mnadeem/nodejs-opentelemetry-tempo
-
-
-https://jessitron.com/2021/08/11/run-an-opentelemetry-collector-locally-in-docker/
-
-
-
-https://open-telemetry.github.io/opentelemetry-js/modules.html
-

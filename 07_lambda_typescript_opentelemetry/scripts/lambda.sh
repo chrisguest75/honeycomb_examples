@@ -55,7 +55,10 @@ case $i in
     ;;     
     -d|--deploy)
         npx sls deploy --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose      
-    ;;     
+    ;;  
+    -o|--offline)
+        npx sls offline --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose      
+    ;;        
     -r|--remove)
         npx sls remove --aws-profile "${AWS_PROFILE}" --region "${AWS_REGION}" --verbose      
     ;;     

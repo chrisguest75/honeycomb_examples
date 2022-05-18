@@ -4,6 +4,15 @@ Demonstrate how to use serverless framework to deploy a typescript function with
 
 Help with AWS CLI [here](https://github.com/chrisguest75/shell_examples/blob/master/33_awscli/README.md)  
 
+TODO:
+
+* Get local working.
+* Build `otel-collector-config.yaml` from template
+* Remove the esbuild bundler for otel.
+* root span is broken
+* Fix the faas version - $LATEST
+* Pull in layer from regional config 
+
 ## Quick
 
 ```sh
@@ -15,23 +24,13 @@ npm run deploy && npm run invoke && npm run logs
 ```sh
 # create an example for typescript
 serverless create --template aws-nodejs-typescript     
-```
 
-## Add pino logging
-
-```sh
-npm install pino     
-npm install --save-dev @types/pino   
-```
-
-## Local
-
-```sh
 npx sls plugin install -n serverless-offline     
-
 # NOW: add 'serverless-offline' to `serverless.ts`
 
-npx sls offline    
+# Add pino logging
+npm install pino     
+npm install --save-dev @types/pino   
 ```
 
 ## Deploy
@@ -75,7 +74,24 @@ npm run remove
 
 ```sh
 # package code
-npm run package
+npm run build
+```
+
+## Local
+
+```sh
+# run locally 
+npm run offline
+
+# run a test
+curl -H 'Content-Type: application/json' -X POST http://localhost:3000/dev/hello -d @./src/functions/hello/mock.json
+```
+
+## Troubleshooting
+
+```sh
+# unpack the lambda
+unzip ./.serverless/hello.zip -d ./.serverless/hello       
 ```
 
 ## Resources
@@ -100,3 +116,15 @@ https://github.com/open-telemetry/opentelemetry-lambda/blob/0a83149fe2f23a7dab64
 
 How to created nested spans without passing parents around
 https://github.com/open-telemetry/opentelemetry-js/issues/1963
+
+
+Bundling issues...
+https://esbuild.github.io/
+https://www.serverless.com/plugins/serverless-esbuild
+
+Maybe this https://www.npmjs.com/package/esbuild-node-externals
+and use https://www.serverless.com/plugins/serverless-esbuild to configure the plugin
+
+Local layers
+https://eliux.github.io/serverless/good-practices-for-using-aws-layers-with-serverless-framework/
+

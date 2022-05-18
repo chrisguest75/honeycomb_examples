@@ -78,7 +78,6 @@ async function listbuckets(): Promise<number> {
     activeSpan?.end()
     resolve(response.Buckets?.length)
   })
-  return
 }
 
 /* 

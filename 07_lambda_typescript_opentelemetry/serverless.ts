@@ -13,6 +13,18 @@ const serverlessConfiguration: AWS = {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
+    tags: {
+      owner: "chrisguest",
+      tags: "true",
+      GitRepo: "https://github.com/chrisguest75/honeycomb_examples",
+      GitRepoPath: "07_lambda_typescript_opentelemetry",
+      AppId: "honeycomb_examples",
+      ServiceGroup: "serverless"      
+    },
+    stackTags: {
+      owner: "chrisguest",
+      stacktags: "true"
+    },    
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',

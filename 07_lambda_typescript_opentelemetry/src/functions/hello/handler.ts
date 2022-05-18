@@ -59,48 +59,72 @@ function createResponse(name: string, numberBuckets: number, event: any) {
   return response;
 }
 
+async function listbuckets(): Promise<number> {
+  const activeSpan = opentelemetry.trace
+    .getTracer(process.env.OTEL_SERVICE_NAME)
+    .startSpan("s3-listbuckets", undefined, opentelemetry.context.active())
+  const client = new S3Client({
+    region: 'us-east-1',
+  });
+
+  const response = await client.send(new ListBucketsCommand({}));
+  // eslint-disable-next-line no-console
+  logger.info({
+    function: 'listbuckets',
+    numberOfBuckets: response.Buckets?.length,
+  });
+
+  return new Promise((resolve) => {
+    activeSpan?.end()
+    resolve(response.Buckets?.length)
+  })
+  return
+}
+
+/* 
+handler
+*/ 
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   logger.info('Enter ValidatedEventAPIGatewayProxyEvent')
   
+  // start span for handler
   const tracer = opentelemetry.trace.getTracer(process.env.OTEL_SERVICE_NAME)
   const activeSpan = tracer.startSpan('ValidatedEventAPIGatewayProxyEvent', undefined, opentelemetry.context.active())
   activeSpan?.addEvent('Enter ValidatedEventAPIGatewayProxyEvent', {})
+  activeSpan?.setAttribute('user', event.body.name)
+  activeSpan?.setAttribute('content-length', event.headers['content-length'])
 
+  // fake function that takes some time
   let sleeping: Promise<unknown>
   opentelemetry.context.with(opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan), () => {
     sleeping = sleep(1000)
   })
 
-  const s3activeSpan = tracer.startSpan("s3stuff", undefined, opentelemetry.context.active())
-  const client = new S3Client({
-    region: 'us-east-1',
-  });
-  const s3response = await client.send(new ListBucketsCommand({}));
-  // eslint-disable-next-line no-console
-  logger.info({
-    function: 'hello',
-    numberOfBuckets: s3response.Buckets?.length,
-  });
-  s3activeSpan?.end()
 
   // TODO: typing?
   let response
-  opentelemetry.context.with(opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan), () => {
-    response = createResponse(event.body.name, s3response.Buckets?.length, event) 
+  // list some buckets (count them)
+  opentelemetry.context.with(opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan), async () => {
+    let buckets = await listbuckets() 
+    response = createResponse(event.body.name, buckets, event) 
   })
 
+  // fake function
   let sleeping2: Promise<unknown>
   opentelemetry.context.with(opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan), () => {
     sleeping2 = sleep(500)
   })
 
+  // recursive functions 
   opentelemetry.context.with(opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan), () => {
     recursive_nested(5) 
   })
  
+  // wait
   await sleeping
   await sleeping2
   
+  activeSpan?.addEvent('Exit ValidatedEventAPIGatewayProxyEvent', {})
   activeSpan?.end()
   logger.info('Exit ValidatedEventAPIGatewayProxyEvent')
   return response

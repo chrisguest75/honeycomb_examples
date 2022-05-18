@@ -50,7 +50,7 @@ provider:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-handler
     OPENTELEMETRY_COLLECTOR_CONFIG_FILE: /var/task/otel-collector-config.yaml
-    OTEL_SERVICE_NAME: 13-lambda-js-opentelemetry
+    OTEL_SERVICE_NAME: service-13-lambda-js-opentelemetry
     OTEL_PROPAGATORS: tracecontext
     OTEL_TRACES_SAMPLER: always_on
     OTEL_LOG_LEVEL: ALL
@@ -127,3 +127,9 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+
+package:  
+  individually: true
+  patterns: 
+    - 'otel-collector-config.yaml' 

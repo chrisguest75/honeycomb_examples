@@ -5,8 +5,7 @@ Demonstrate how to use serverless framework to deploy a non-bundled node functio
 
 Help with AWS CLI [here](https://github.com/chrisguest75/shell_examples/blob/master/33_awscli/README.md)  
 
-
-## Deploy
+## Configure
 
 ```sh
 # list available profiles
@@ -15,16 +14,18 @@ aws configure list-profiles
 # configure
 export AWS_PROFILE=the-profile
 export AWS_REGION=us-east-1
-
-# info and deploy
-npm run info
-
-# deploy
-npm run deploy
 ```
 
+## Quick
 
- serverless create --template aws-nodejs
+```sh
+npm run deploy && npm run invoke && npm run logs
+```
 
+## Create
+
+```sh
+serverless create --template aws-nodejs
+```
 
  

@@ -4,6 +4,12 @@ Demonstrate how to use serverless framework to deploy a typescript function with
 
 Help with AWS CLI [here](https://github.com/chrisguest75/shell_examples/blob/master/33_awscli/README.md)  
 
+## Quick
+
+```sh
+npm run deploy && npm run invoke && npm run logs
+```
+
 ## Create
 
 ```sh
@@ -44,6 +50,8 @@ npm run info
 # deploy
 npm run deploy
 ```
+
+## Test
 
 ```sh
 # show functions

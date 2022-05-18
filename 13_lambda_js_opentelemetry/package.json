@@ -1,0 +1,21 @@
+{
+  "name": "13_lambda_js_opentelemetry",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "package": "./scripts/lambda.sh --package",
+    "deploy": "./scripts/lambda.sh --deploy",
+    "invoke": "./scripts/lambda.sh --invoke",
+    "logs": "./scripts/lambda.sh --logs",
+    "info": "./scripts/lambda.sh --info",
+    "remove": "./scripts/lambda.sh --remove",
+    "details": "AWS_PAGER= aws --profile $AWS_PROFILE --region $AWS_REGION lambda list-functions --query 'Functions[?starts_with(FunctionName, `service-13-lambda-js-opentelemetry`) == `true`]'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.92.0",
+    "@opentelemetry/api": "^1.1.0"
+  }
+}

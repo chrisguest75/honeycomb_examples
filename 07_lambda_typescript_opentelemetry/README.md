@@ -26,6 +26,8 @@ npm run deploy && npm run invoke && npm run logs
 serverless create --template aws-nodejs-typescript     
 
 npx sls plugin install -n serverless-offline     
+npm install --save-dev serverless-esbuild esbuild
+npm install --save-dev esbuild-node-externals
 # NOW: add 'serverless-offline' to `serverless.ts`
 
 # Add pino logging
@@ -127,4 +129,7 @@ and use https://www.serverless.com/plugins/serverless-esbuild to configure the p
 
 Local layers
 https://eliux.github.io/serverless/good-practices-for-using-aws-layers-with-serverless-framework/
+
+https://www.npmjs.com/package/esbuild-node-externals
+https://www.serverless.com/plugins/serverless-esbuild#esbuild-plugins
 

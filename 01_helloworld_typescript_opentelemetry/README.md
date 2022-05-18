@@ -2,6 +2,11 @@
 
 Demonstrates a simple cmdline application (copy these steps)  
 
+TODO:
+
+* Tidy up this code and use better tracing concepts.  
+* Add the recursive function and add get all the traces parented correctly.  
+
 Contains:
 
 * Hierarchical span creation
@@ -296,3 +301,8 @@ npm run start:dev
 * OpenTelemetry for NodeJS: All you need to know about tracing [here](https://medium.com/@tedsuo/opentelemetry-nodejs-all-you-need-to-know-a4e1c8f2f93)
 * axios/axios repo [here](https://github.com/axios/axios)
 * Cat Facts API Documentation [here](https://alexwohlbruck.github.io/cat-facts/docs/)
+
+
+
+
+https://github.com/tedsuo/otel-node-basics/blob/main/server.js

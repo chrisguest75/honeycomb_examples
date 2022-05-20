@@ -2,6 +2,12 @@
 
 Demonstrate using tracing with the `otel-collector`  
 
+TODO:
+
+* This is still not working and I'm thinking it might be something to do with the insecure connection.  On the cli tool I use insecure=true
+* How do I better debug grpc connections?
+* try as an actual sidecar in dockercompose
+
 ## Start Collector
 
 NOTE: Use yq to insert keys into the config
@@ -16,6 +22,8 @@ docker compose logs --no-log-prefix otel-collector -f
 
 
 docker run \
+  --rm
+  --name otelcollector
   -p 14268:14268 \
   -p 4317-4318:4317-4318 \
   -v $(pwd)/otel-collector-config.yaml:/etc/otel/config.yaml \

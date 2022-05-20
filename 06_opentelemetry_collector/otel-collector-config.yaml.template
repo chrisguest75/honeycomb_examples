@@ -1,60 +1,24 @@
-
-
 receivers:
-  # jaeger:
-  #   protocols:
-  #     thrift_http:
-  #       endpoint: "0.0.0.0:14268"
   otlp:
     protocols:
       grpc: # on port 4317
-      http: # on port 4318
-  # prometheus:
-  #   config:
-  #     scrape_configs:
-  #       - job_name: "prometheus"
-  #         scrape_interval: 15s
-  #         static_configs:
-  #           - targets: ["0.0.0.0:9100"]
 
 processors:
   batch:
 
-# exporters:
-#   honeycomb:
-#     api_key: "YOUR_API_KEY"
-#     # logging:
-#     #   loglevel: debug
-
-# exporters:
-#   otlp:
-#     endpoint: "api.honeycomb.io:443"
-#     headers:
-#       "x-honeycomb-team": "YOUR_API_KEY"
-
 exporters:
-  otlphttp:
-    endpoint: "https://api.honeycomb.io/"
+  otlp:
+    endpoint: "api.honeycomb.io:443"
     headers:
-      "x-honeycomb-team": "YOUR_API_KEY"
-
-  # otlp/metrics:
-  #   endpoint: "api.honeycomb.io:443"
-  #   headers:
-  #     "x-honeycomb-team": "YOUR_API_KEY"
-  #     "x-honeycomb-dataset": "06_opentelemetry_collector"
-
-extensions:
-  health_check:
+      "x-honeycomb-team": "APIKEY"
 
 service:
-  extensions: [health_check]
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlphttp]
-    # metrics:
-    #   receivers: [prometheus]
-    #   processors: []
-    #   exporters: [otlp/metrics]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlp ]
+
+  telemetry:
+    logs:
+      level: "debug"

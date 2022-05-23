@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-if [ -f "./.env" ]; then
-    echo "Source ./.env"
-    . "./.env"
+ENVFILE="./.env"
+if [ -f "${ENVFILE}" ]; then
+    echo "Source ${ENVFILE}"
+    . "${ENVFILE}"
 fi
 
 echo "***************************************"

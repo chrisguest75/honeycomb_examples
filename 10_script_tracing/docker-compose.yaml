@@ -16,14 +16,18 @@ services:
       networks:
         - service_bridge  
         
-    # ubuntu:
-    #     build: 
-    #         context: ./ubuntu
-    #         dockerfile: Dockerfile
-    #     #entrypoint: "sleep"
-    #     command: "3000"
-    #     networks:
-    #         - service_bridge
+    ubuntu:
+      build: 
+        context: .
+        dockerfile: Dockerfile
+      environment:
+        - HONEYCOMB_SERVICENAME=10_script_tracing
+        - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317            
+        - DATE_COMMAND=date
+      depends_on:
+        - otel-collector           
+      networks:
+        - service_bridge
 
 networks:
     service_bridge:

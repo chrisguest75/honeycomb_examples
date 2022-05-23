@@ -7,6 +7,7 @@ TODO:
 * Is it possible without the collector?
 * Docker image test
 * More complicated test script
+* root span
 
 ## Prereqs
 
@@ -19,8 +20,7 @@ brew install otel-cli
 
 ```sh
 # start otel collector
-docker compose up -d --build  
-docker compose logs --no-log-prefix otel-collector           
+./start-collector.sh
 
 # run tests
 ./test-cli.sh
@@ -36,3 +36,4 @@ docker compose down
 * OpenTelemetry Collector Demo [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo)
 * Honeycomb OpenTelemetry Collector [here](https://docs.honeycomb.io/getting-data-in/otel-collector/)
 
+https://dev.to/saintdle/download-releases-from-github-using-curl-and-wget-54fi

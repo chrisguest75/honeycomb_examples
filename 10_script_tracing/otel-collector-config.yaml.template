@@ -18,3 +18,7 @@ service:
       receivers: [ otlp ]
       processors: [ batch ]
       exporters: [ otlp ]
+      
+  telemetry:
+    logs:
+      level: "debug"

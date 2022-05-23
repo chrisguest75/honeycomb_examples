@@ -5,7 +5,10 @@ Demonstrate using tracing `equinix-labs/otel-cli`
 TODO:
 
 * Is it possible without the collector?
-* More complicated test script
+* add span attrs.
+* use tp-export.
+* handle errors
+* events
 * root span
 
 ## Prereqs

@@ -15,8 +15,9 @@ COPY ./test-cli.sh ./test-cli.sh
 COPY <<EOF /workbench/trace.sh
 #!/usr/bin/env bash
 while true; do 
+    unset TRACEPARENT
     /workbench/test-cli.sh
-    sleep 10;
+    sleep 100;
 done
 EOF
 

@@ -18,6 +18,9 @@ brew install otel-cli
 ## Run example
 
 ```sh
+# copy ad edit the .env file
+cp ./.env.template ./.env
+
 # start otel collector
 ./controller.sh --start
 

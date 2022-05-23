@@ -8,5 +8,5 @@ echo "***************************************"
 yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./otel-collector-config.yaml.template > ./otel-collector-config.yaml
 
 #echo "** Start collector **"
-docker compose up 
+docker compose up --build --force-recreate 
 

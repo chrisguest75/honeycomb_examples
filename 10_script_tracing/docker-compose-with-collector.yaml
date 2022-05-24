@@ -1,5 +1,5 @@
 services:           
-    otel-collector:
+    collector:
       image: otel/opentelemetry-collector-contrib:0.50.0
       command: ["--config=/etc/otel-collector-config.yaml", ""]
       volumes:
@@ -14,19 +14,21 @@ services:
         - "55670:55679" # zpages extension
       networks:
         - service_bridge  
+      profiles: [all, collector]         
         
-    ubuntu:
+    tracing:
       build: 
         context: ./client
         dockerfile: Dockerfile
       environment:
         - HONEYCOMB_SERVICENAME=10_script_tracing
-        - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317            
+        - OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317            
         - DATE_COMMAND=date
       depends_on:
-        - otel-collector           
+        - collector           
       networks:
         - service_bridge
+      profiles: [all, tracing]      
 
 networks:
     service_bridge:

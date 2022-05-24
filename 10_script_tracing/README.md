@@ -5,8 +5,9 @@ Demonstrate using tracing `equinix-labs/otel-cli`
 TODO:
 
 * Is it possible without the collector?
-* More complicated test script
-* root span
+* use tp-export.
+* handle errors
+* events
 
 ## Prereqs
 
@@ -18,14 +19,24 @@ brew install otel-cli
 ## Run example
 
 ```sh
-# copy ad edit the .env file
+# copy and edit the .env file
 cp ./.env.template ./.env
 
-# start otel collector
-./controller.sh --start
+# start with test
+./control.sh --profile=all --start 
 
 # shutdown collector
-./controller.sh --stop
+./control.sh --profile=all --stop
+```
+
+## Start and test local
+
+```sh
+# start otel collector
+./control.sh --profile=collector --start 
+
+# run test local 
+./client/test-cli.sh            
 ```
 
 ## Resources

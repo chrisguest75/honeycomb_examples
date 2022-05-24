@@ -11,15 +11,18 @@ function help() {
 usage: $SCRIPT_NAME options
 
 OPTIONS:
-    -h --help -?                show this help
-    --start                     start the example
-    --stop                      stop the example
+    -h --help -?                        show this help
+    --start                             start the example
+    --stop                              stop the example
+    -p|--profile=all|collector|tracing  set the profile (default=collector)               
 
 Examples:
     $SCRIPT_NAME --help 
 
 EOF
 }
+
+PROFILE=collector
 
 for i in "$@"
 do
@@ -28,23 +31,25 @@ case $i in
         help
         exit 0
     ;; 
+    -p=*|--profile=*)
+        PROFILE="${i#*=}"
+        shift # past argument=value
+    ;;      
     --start)
         ENVFILE="./.env"
         if [ -f "${ENVFILE}" ]; then
             echo "Source ${ENVFILE}"
             . "${ENVFILE}"
         fi
-        echo "***************************************"
         echo "** Create config file"
-        echo "***************************************"
         yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./collector/otel-collector-config.yaml.template > ./collector/otel-collector-config.yaml
 
-        #echo "** Start collector **"
-        docker compose -f docker-compose-with-collector.yaml up --build --force-recreate 
+        echo "** Start profile $PROFILE"
+        docker compose -f docker-compose-with-collector.yaml --profile $PROFILE up --build --force-recreate 
         exit 0
     ;; 
     --stop)
-        docker compose -f docker-compose-with-collector.yaml down
+        docker compose -f docker-compose-with-collector.yaml --profile $PROFILE down --remove-orphans
         exit 0
     ;; 
 esac

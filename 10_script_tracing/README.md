@@ -5,6 +5,7 @@ Demonstrate using tracing `equinix-labs/otel-cli`
 TODO:
 
 * Is it possible without the collector?
+    * https://github.com/equinix-labs/otel-cli/blob/ff5a4ebe99b32ffef24482f58409bc08e01641f5/otelcli/plumbing.go#L109
 * use tp-export.
 * handle errors
 * events
@@ -29,14 +30,24 @@ cp ./.env.template ./.env
 ./control.sh --profile=all --stop
 ```
 
-## Start and test local
+## Start and test (local script)
 
 ```sh
 # start otel collector
-./control.sh --profile=collector --start 
+./control.sh --profile=collectoronly --start 
 
 # run test local 
 ./client/test-cli.sh            
+```
+
+## Start and test (containerised script)
+
+```sh
+# start otel collector and tracing container
+./control.sh --profile=collector --start 
+
+# exec into it
+docker compose -f docker-compose-with-collector.yaml --profile all exec -it tracing /bin/bash
 ```
 
 ## Resources

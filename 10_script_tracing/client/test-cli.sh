@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
+set -euf -o pipefail
 
 ENVFILE="./.env"
 if [ -f "${ENVFILE}" ]; then
     echo "Source ${ENVFILE}"
     . "${ENVFILE}"
 fi
+
+function span_event {
+    echo "**** $FUNCNAME NumArgs:$# ****"
+    local cliout=
+    local start=$($DATE_COMMAND --rfc-3339=ns) # rfc3339 with nanoseconds
+    cliout=$(otel-cli span --endpoint "${OTEL_EXPORTER_OTLP_ENDPOINT}" --verbose --tp-required --tp-print --insecure true event -e "${HONEYCOMB_SERVICENAME}" --time "$start")
+    echo "$cliout"
+    #cliout=$(echo "$cliout" | grep "TRACEPARENT")
+    #echo "$cliout"
+    #eval "export $cliout"
+    #echo "TRACEPARENT=$TRACEPARENT"
+}
 
 function span_function {
     echo "**** $FUNCNAME NumArgs:$# ****"
@@ -73,8 +86,10 @@ echo "ROOTSPAN=$root_store"
 SPAN_NAME=s3_copy
 SRC_FILE="s3://file.txt"
 DST_FILE="./file.txt"
-
 span_function "copy_s3 '$SRC_FILE' '$DST_FILE'" "${SPAN_NAME}" "attribute1='test value',attribute2='is this working?',src_file=$SRC_FILE,dst_file=$DST_FILE"
+
+# not working
+#span_event "attribute1='an event',attribute2='with attributes'"
 
 SPAN_NAME=process_file
 TRACEPARENT=$root_store

@@ -12,17 +12,21 @@ usage: $SCRIPT_NAME options
 
 OPTIONS:
     -h --help -?                        show this help
-    --start                             start the example
-    --stop                              stop the example
-    -p|--profile=all|collector|tracing  set the profile (default=collector)               
+    --start                                     start the example
+    --stop                                      stop the example
+    -p|--profile=all|collectoronly|collector    set the profile (default=collector)               
 
 Examples:
     $SCRIPT_NAME --help 
 
+    $SCRIPT_NAME --profile all --start
+
+    $SCRIPT_NAME --profile all --stop
+
 EOF
 }
 
-PROFILE=collector
+PROFILE=collectoronly
 
 for i in "$@"
 do
@@ -41,17 +45,23 @@ case $i in
             echo "Source ${ENVFILE}"
             . "${ENVFILE}"
         fi
-        echo "** Create config file"
+        echo "** Create config file ./collector/otel-collector-config.yaml"
         yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./collector/otel-collector-config.yaml.template > ./collector/otel-collector-config.yaml
+        echo "** Create config file ./client/otel-collector-config.yaml"
+        yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./client/otel-collector-config.yaml.template > ./client/otel-collector-config.yaml
 
         echo "** Start profile $PROFILE"
         docker compose -f docker-compose-with-collector.yaml --profile $PROFILE up --build --force-recreate 
-        exit 0
+        shift
     ;; 
     --stop)
         docker compose -f docker-compose-with-collector.yaml --profile $PROFILE down --remove-orphans
-        exit 0
+        shift
     ;; 
+    *)
+        echo "Unrecognised ${i}"
+    ;;    
 esac
 done    
 
+exit 0 

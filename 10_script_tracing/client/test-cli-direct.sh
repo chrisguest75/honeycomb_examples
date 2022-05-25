@@ -12,14 +12,27 @@ function span_function {
     local work_function=$1
     local span_name=$2
     local cliout=
+
+    export GODEBUG=http2debug=1
+    export GODEBUG=http2debug=2 
+    export GRPC_TRACE=all
+    export GRPC_VERBOSITY=DEBUG 
+    export GRPC_TRACE=list_tracers
+
+    #export OTEL_EXPORTER_OTLP_ENDPOINT="${HONEYCOMB_APIHOST}"
+    #export OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=${HONEYCOMB_APIKEY}"
+    #echo "OTEL_EXPORTER_OTLP_ENDPOINT=$OTEL_EXPORTER_OTLP_ENDPOINT"
+    #echo "OTEL_EXPORTER_OTLP_HEADERS=$OTEL_EXPORTER_OTLP_HEADERS"
+    otel-cli status --config ./config.json
     local start=$($DATE_COMMAND --rfc-3339=ns) # rfc3339 with nanoseconds
     eval "$work_function"
     local end=$($DATE_COMMAND +%s.%N) # Unix epoch with nanoseconds
     if [[ $# -ge 3 ]]; then
         local attributes=$3
-        cliout=$(otel-cli span --fail --endpoint "https://api.honeycomb.io" --otlp-headers "x-honeycomb-team=${HONEYCOMB_APIKEY}" --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
+        #--endpoint "https://api.honeycomb.io" --otlp-headers "x-honeycomb-team=wUfkaOpW1HWce2pT9Sw27I"
+        cliout=$(otel-cli span --config ./config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
     else
-        cliout=$(otel-cli span --fail --endpoint "https://api.honeycomb.io" --otlp-headers "x-honeycomb-team=${HONEYCOMB_APIKEY}" --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
+        cliout=$(otel-cli span --config ./config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
     fi
     #echo "$cliout"
     cliout=$(echo "$cliout" | grep "TRACEPARENT")

@@ -1,0 +1,11 @@
+{
+    "timeout": "1s",
+    "endpoint": "api.honeycomb.io:443",
+    "headers": {
+        "x-honeycomb-team": "APIKEY",
+        "x-honeycomb-dataset": "10_script_tracing"
+    },
+    "insecure": false,
+    "no_tls_verify": false,
+    "verbose": true
+}

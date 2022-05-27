@@ -45,7 +45,6 @@ function span_function {
     local end=$($DATE_COMMAND +%s.%N) # Unix epoch with nanoseconds
     if [[ $# -ge 3 ]]; then
         local attributes=$3
-        #--endpoint "https://api.honeycomb.io" --otlp-headers "x-honeycomb-team=wUfkaOpW1HWce2pT9Sw27I"
         cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
     else
         cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")

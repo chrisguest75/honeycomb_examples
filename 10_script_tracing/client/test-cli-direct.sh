@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
+readonly SCRIPT_NAME=$(basename "$0")
+readonly SCRIPT_PATH=${0}
+readonly SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+readonly HOME_DIR=~
+if [[ $(command -v greadlink) ]]; then 
+    # mac requires 'brew install coreutils'
+    readonly SCRIPT_FULL_PATH="$(dirname "$(greadlink -f "$0")")"
+else
+    readonly SCRIPT_FULL_PATH="$(dirname "$(readlink -f "$0")")"
+fi 
+
+if [ -n "${DEBUG_ENVIRONMENT-}" ];then 
+    # if DEBUG_ENVIRONMENT is set
+    env
+    export
+fi
+
 ENVFILE="./.env"
 if [ -f "${ENVFILE}" ]; then
     echo "Source ${ENVFILE}"
@@ -13,26 +30,25 @@ function span_function {
     local span_name=$2
     local cliout=
 
-    export GODEBUG=http2debug=1
-    export GODEBUG=http2debug=2 
-    export GRPC_TRACE=all
-    export GRPC_VERBOSITY=DEBUG 
-    export GRPC_TRACE=list_tracers
+    #export GODEBUG=http2debug=1
+    #export GODEBUG=http2debug=2 
+    #export GRPC_TRACE=all
+    #export GRPC_VERBOSITY=DEBUG 
+    #export GRPC_TRACE=list_tracers
 
     #export OTEL_EXPORTER_OTLP_ENDPOINT="${HONEYCOMB_APIHOST}"
     #export OTEL_EXPORTER_OTLP_HEADERS="x-honeycomb-team=${HONEYCOMB_APIKEY}"
     #echo "OTEL_EXPORTER_OTLP_ENDPOINT=$OTEL_EXPORTER_OTLP_ENDPOINT"
     #echo "OTEL_EXPORTER_OTLP_HEADERS=$OTEL_EXPORTER_OTLP_HEADERS"
-    otel-cli status --config ./config.json
     local start=$($DATE_COMMAND --rfc-3339=ns) # rfc3339 with nanoseconds
     eval "$work_function"
     local end=$($DATE_COMMAND +%s.%N) # Unix epoch with nanoseconds
     if [[ $# -ge 3 ]]; then
         local attributes=$3
         #--endpoint "https://api.honeycomb.io" --otlp-headers "x-honeycomb-team=wUfkaOpW1HWce2pT9Sw27I"
-        cliout=$(otel-cli span --config ./config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
+        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
     else
-        cliout=$(otel-cli span --config ./config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
+        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
     fi
     #echo "$cliout"
     cliout=$(echo "$cliout" | grep "TRACEPARENT")
@@ -57,6 +73,8 @@ function copy_s3 {
 echo "***************************************"
 echo "** Generate spans"
 echo "***************************************"
+otel-cli status --config ${SCRIPT_FULL_PATH}/config.json
+
 # root span
 SPAN_NAME=root
 span_function "${SPAN_NAME}" "processing files (no collector)" "entrypoint='true',language='gb'"

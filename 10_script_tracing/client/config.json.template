@@ -5,7 +5,7 @@
         "x-honeycomb-team": "APIKEY",
         "x-honeycomb-dataset": "10_script_tracing"
     },
-    "insecure": true,
-    "no_tls_verify": true,
+    "insecure": false,
+    "no_tls_verify": false,
     "verbose": true
 }

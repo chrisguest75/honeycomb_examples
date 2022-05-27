@@ -4,8 +4,6 @@ Demonstrate using tracing `equinix-labs/otel-cli`
 
 TODO:
 
-* Is it possible without the collector?
-    * https://github.com/equinix-labs/otel-cli/blob/ff5a4ebe99b32ffef24482f58409bc08e01641f5/otelcli/plumbing.go#L109
 * use tp-export.
 * handle errors
 * events

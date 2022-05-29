@@ -24,6 +24,18 @@ if [ -f "${ENVFILE}" ]; then
     . "${ENVFILE}"
 fi
 
+function span_event {
+    echo "**** $FUNCNAME NumArgs:$# ****"
+    local cliout=
+    local start=$($DATE_COMMAND --rfc-3339=ns) # rfc3339 with nanoseconds
+    cliout=$(otel-cli span --verbose event -e "${HONEYCOMB_SERVICENAME}" --time "$start")
+    echo "$cliout"
+    #cliout=$(echo "$cliout" | grep "TRACEPARENT")
+    #echo "$cliout"
+    #eval "export $cliout"
+    #echo "TRACEPARENT=$TRACEPARENT"
+}
+
 function span_function {
     echo "**** $FUNCNAME NumArgs:$# ****"
     local work_function=$1
@@ -45,9 +57,9 @@ function span_function {
     local end=$($DATE_COMMAND +%s.%N) # Unix epoch with nanoseconds
     if [[ $# -ge 3 ]]; then
         local attributes=$3
-        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
+        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end" --attrs "$attributes")
     else
-        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print --insecure true -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
+        cliout=$(otel-cli span --config ${SCRIPT_FULL_PATH}/config.json --fail --verbose --tp-print -n "${HONEYCOMB_SERVICENAME}" -s "${span_name}" --start "$start" --end "$end")
     fi
     #echo "$cliout"
     cliout=$(echo "$cliout" | grep "TRACEPARENT")
@@ -66,6 +78,7 @@ function copy_s3 {
     local dst_file=$2
     local filesize="$(( ( RANDOM % 10 )  + 1 ))"
     echo "copying '$src_file' to '$dst_file' - size $filesize mb"
+    #sleep 1
     sleep $filesize
 }
 
@@ -85,5 +98,7 @@ SRC_FILE="s3://file.txt"
 DST_FILE="./file.txt"
 span_function "copy_s3 '$SRC_FILE' '$DST_FILE'" "${SPAN_NAME}" "attribute1='test value',attribute2='is this working?',src_file=$SRC_FILE,dst_file=$DST_FILE"
 
+# not working
+#span_event "attribute1='an event',attribute2='with attributes'"
 
 unset TRACEPARENT

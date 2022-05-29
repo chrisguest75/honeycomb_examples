@@ -11,23 +11,20 @@ TODO:
 * Mongo
 * Knex or Prisma
 * Redis
-* Lambda
 * Propagation
 
 ## Glossary
 
+* `Root Span` is a span with no parent.  
 * `Spans`
 * `SpanKind`
 * `Events`
 * `Context`
 * `Trace`
 * `Context Handler`
+* `Attributes` key-value pairs attached to spans and events.
 * `Semantic Attributes` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md)
 * `Instrumentation`
-
-TODO:  
-
-* create client
 
 ## 00 - hygen templates
 
@@ -64,6 +61,12 @@ Demonstrate how to get honeycomb build events working.
 Demonstrate how to use serverless framework to deploy a typescript function with Open Telemetry.  
 
 [README.md](./07_lambda_typescript_opentelemetry/README.md)  
+
+## 10 - Tracing in Scripts
+
+Demonstrate tracing in shell scripts using `equinix-labs/otel-cli`  
+
+[README.md](./10_script_tracing/README.md)  
 
 ## 11 - Markers
 

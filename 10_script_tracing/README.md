@@ -1,6 +1,6 @@
 # README
 
-Demonstrate using tracing `equinix-labs/otel-cli`  
+Demonstrate tracing in shell scripts using `equinix-labs/otel-cli`  
 
 TODO:
 

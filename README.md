@@ -57,6 +57,12 @@ Demonstrate how to get honeycomb build events working.
 
 [README.md](./04_buildevents/README.md)  
 
+## 06 - Open Telemetry Collector
+
+Demonstrate using tracing with the `otel-collector` as a sidecar.  
+
+[README.md](./06_opentelemetry_collector/README.md)  
+
 ## 07 - Lambda typescript opentelemetry
 
 Demonstrate how to use serverless framework to deploy a typescript function with Open Telemetry.  

@@ -27,13 +27,23 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
   }
 
-  const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'grpc://api.honeycomb.io:443/'
+  logger.info(`UNDEFINED:'${process.env.UNDEFINED}'`)
+
+  const endpoint = process.env.COLLECTOR_ENDPOINT || 'grpc://api.honeycomb.io:443/'
+  let insecure = false
+  if (
+    process.env.ENABLE_INSECURE_COLLECTOR == undefined ||
+    process.env.ENABLE_INSECURE_COLLECTOR.toLowerCase() == 'true'
+  ) {
+    insecure = true
+  }
+
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}' using endpoint '${endpoint}'`)
   metadata.set('x-honeycomb-team', apikey)
   //metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({
     url: endpoint,
-    credentials: credentials.createSsl(),
+    credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
     metadata,
   })
 

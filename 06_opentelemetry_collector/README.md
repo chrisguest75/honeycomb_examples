@@ -1,62 +1,52 @@
 # README
 
-Demonstrate using tracing with the `otel-collector`  
+Demonstrate using tracing with the `otel-collector` as a sidecar.  
 
-TODO:
+NOTES:
 
-* This is still not working and I'm thinking it might be something to do with the insecure connection.  On the cli tool I use insecure=true
-* How do I better debug grpc connections?
-* try as an actual sidecar in dockercompose
+* When running as sidecar you need to instantiate the insecure connection.  
+* We're using a versioned `otel/opentelemetry-collector-contrib:0.50.0` rather than latest, as it seems out of date.
 
-## Start Collector
-
-NOTE: Use yq to insert keys into the config
+## Configure
 
 ```sh
-# bring up the agent
-docker compose up -d --build --force-recreate
-
-# show logs for agent
-docker compose logs --no-log-prefix otel-collector -f     
-
-
-
-docker run \
-  --rm
-  --name otelcollector
-  -p 14268:14268 \
-  -p 4317-4318:4317-4318 \
-  -v $(pwd)/otel-collector-config.yaml:/etc/otel/config.yaml \
-  otel/opentelemetry-collector-contrib:0.50.0
+# copy and edit the .env file (add api key)
+cp ./client/.env.template ./client/.env
 ```
 
-## Send trace
+## Run example (dockerised)
+
+NOTE: The api key will be copied to the collector config.  
 
 ```sh
+# start collector and app in docker
+./control.sh --profile=all --start 
+
+# shutdown collector and app
+./control.sh --profile=all --stop
+```
+
+## Send trace (non dockerised app)
+
+```sh
+# start with collector only
+./control.sh --profile=collector --start 
+
 # send a trace
 pushd ./client  
 nvm use       
 npm install   
 npm run start:dev               
-```
 
-## Cleanup
-
-```sh
-# cleanup agent
-docker compose down              
+# shutdown collector and app
+./control.sh --profile=all --stop
 ```
 
 ## Resources
 
-https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
-
-https://docs.honeycomb.io/getting-data-in/otel-collector/
-
-https://opentelemetry.io/docs/collector/configuration/
-
-
-https://github.com/open-telemetry/opentelemetry-collector-contrib
-
-https://hub.docker.com/r/otel/opentelemetry-collector-contrib/tags
+* open-telemetry/opentelemetry-collector-contrib [here](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+* open-telemetry/opentelemetry-collector-contrib demo [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo)
+* OpenTelemetry Collector [here](https://docs.honeycomb.io/getting-data-in/otel-collector/)
+* OpenTelemetry Collector Configuration [here](https://opentelemetry.io/docs/collector/configuration/)
+* otel/opentelemetry-collector-contrib dockerhub tags [here](https://hub.docker.com/r/otel/opentelemetry-collector-contrib/tags)  
 

@@ -1,6 +1,6 @@
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
+import opentelemetry from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 
 // load config
@@ -60,5 +60,3 @@ main()
     logger.error(e)
     process.exit(1)
   })
-
-

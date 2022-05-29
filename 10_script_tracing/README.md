@@ -4,9 +4,8 @@ Demonstrate tracing in shell scripts using `equinix-labs/otel-cli`
 
 TODO:
 
-* use tp-export.
-* handle errors
-* events
+* use tp-export (seems broken).
+* events (also seems broken)
 
 ## Prereqs
 
@@ -35,7 +34,8 @@ cp ./.env.template ./.env
 ./control.sh --profile=collectoronly --start 
 
 # run test local 
-./client/test-cli.sh            
+./client/test-cli.sh  
+          
 # ensure all stopped
 ./control.sh --profile=collectoronly --stop
 

@@ -18,7 +18,7 @@ TODO:
 
 * `Root Span` is a span with no parent.  
 * `Spans`
-* `SpanKind`
+* `SpanKind` defined [here](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#spankind)
 * `Events`
 * `Context`
 * `Trace`

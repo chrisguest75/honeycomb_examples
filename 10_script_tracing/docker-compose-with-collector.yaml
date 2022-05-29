@@ -24,6 +24,7 @@ services:
         - HONEYCOMB_SERVICENAME=10_script_tracing
         - OTEL_EXPORTER_OTLP_ENDPOINT=collector:4317            
         - DATE_COMMAND=date
+      command: "/workbench/test-cli.sh"         
       depends_on:
         - collector           
       networks:

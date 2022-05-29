@@ -37,6 +37,7 @@ services:
       environment:
         - HONEYCOMB_SERVICENAME=10_script_tracing     
         - DATE_COMMAND=date
+      command: "/workbench/test-cli-direct.sh"        
       depends_on:
         - collector           
       networks:

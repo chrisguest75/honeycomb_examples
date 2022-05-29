@@ -47,8 +47,6 @@ case $i in
         fi
         echo "** Create config file ./collector/otel-collector-config.yaml"
         yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./collector/otel-collector-config.yaml.template > ./collector/otel-collector-config.yaml
-        echo "** Create config file ./client/otel-collector-config.yaml"
-        yq e '(.exporters.otlp.headers.x-honeycomb-team) |= "'${HONEYCOMB_APIKEY}'"' ./client/otel-collector-config.yaml.template > ./client/otel-collector-config.yaml
 
         echo "** Start profile $PROFILE"
         docker compose -f docker-compose-with-collector.yaml --profile $PROFILE up --build --force-recreate 

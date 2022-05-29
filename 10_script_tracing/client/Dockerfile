@@ -10,8 +10,7 @@ RUN apt-get update \
 WORKDIR /workbench
 RUN curl -LJO https://github.com/equinix-labs/otel-cli/releases/download/v0.0.20/otel-cli_0.0.20_x86_64.deb 
 RUN dpkg -i otel-cli_0.0.20_x86_64.deb 
-COPY ./test-cli.sh ./test-cli.sh
-COPY ./test-cli-direct.sh ./test-cli-direct.sh
+COPY ./test-cli.sh ./test-cli-direct.sh config.json ./
 
 COPY <<EOF /workbench/trace.sh
 #!/usr/bin/env bash

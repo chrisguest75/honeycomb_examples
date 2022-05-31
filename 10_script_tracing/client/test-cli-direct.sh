@@ -140,6 +140,15 @@ echo "** Generate spans"
 echo "***************************************"
 otel-cli status --config "${CONFIG_PATH}"
 
+awsversion=$(aws --version)
+jqversion=$(jq --version)
+bashversion=$(echo "$BASH_VERSION")
+who=$(whoami)
+
+ATTRIBUTES="awsversion='$awsversion',jqversion='$jqversion',bashversion='$bashversion'"
+ATTRIBUTES="${ATTRIBUTES},who='$who'"
+echo "${ATTRIBUTES}"
+
 # root span
 SPAN_FUNCTION=root
 span_function "${SPAN_FUNCTION}" "processing files (no collector)" "collector=false,entrypoint=true,language='gb'"
@@ -148,7 +157,7 @@ echo "ROOTSPAN=$root_store"
 
 SPAN_NAME=empty_attributes
 TRACEPARENT=$root_store
-span_function "empty_attributes" "${SPAN_NAME}" "" "param1" "param2" "param3"
+span_function "empty_attributes" "${SPAN_NAME}" "${ATTRIBUTES}" "param1" "param2" "param3"
 exitcode=$?
 if [[ exitcode -ne 0 ]]; then
     echo "'$SPAN_NAME' failed"
@@ -157,7 +166,7 @@ fi
 
 SPAN_NAME=test_error
 TRACEPARENT=$root_store
-span_function "test_error" "${SPAN_NAME}" "" "${FAIL_WITH_ERROR}" "param2" "param3" "param4"
+span_function "test_error" "${SPAN_NAME}" "${ATTRIBUTES}" "${FAIL_WITH_ERROR}" "param2" "param3" "param4"
 exitcode=$?
 if [[ exitcode -ne 0 ]]; then
     echo "'$SPAN_NAME' failed"
@@ -169,7 +178,8 @@ SPAN_NAME=s3_copy
 TRACEPARENT=$root_store
 SRC_FILE="s3://file.txt"
 DST_FILE="./file.txt"
-span_function "copy_s3" "${SPAN_NAME}" "attribute1='test value',attribute2='is this working?',src_file=$SRC_FILE,dst_file=$DST_FILE" "$SRC_FILE" "$DST_FILE"
+NEW_ATTRIBUTES="${ATTRIBUTES},attribute1='test value',attribute2='is this working?',src_file=$SRC_FILE,dst_file=$DST_FILE"
+span_function "copy_s3" "${SPAN_NAME}" "${NEW_ATTRIBUTES}" "$SRC_FILE" "$DST_FILE"
 exitcode=$?
 if [[ exitcode -ne 0 ]]; then
     echo "'$SPAN_NAME' failed"
@@ -179,7 +189,8 @@ fi
 SPAN_NAME=process_file
 TRACEPARENT=$root_store
 echo "CURRENT TRACEPARENT=$TRACEPARENT"
-span_function "process_file" "${SPAN_NAME}" "file='$DST_FILE'" "$DST_FILE"
+NEW_ATTRIBUTES="${ATTRIBUTES},file='$DST_FILE'"
+span_function "process_file" "${SPAN_NAME}" "${NEW_ATTRIBUTES}" "$DST_FILE"
 exitcode=$?
 if [[ exitcode -ne 0 ]]; then
     echo "'$SPAN_NAME' failed"
@@ -190,7 +201,8 @@ SPAN_NAME=recurse_work
 TRACEPARENT=$root_store
 echo "CURRENT TRACEPARENT=$TRACEPARENT"
 DEPTH="$(( ( RANDOM % 10 )  + 1 ))"
-span_function "recurse_work" "${SPAN_NAME}" "depth=$DEPTH" "$DEPTH"
+NEW_ATTRIBUTES="${ATTRIBUTES},depth=$DEPTH"
+span_function "recurse_work" "${SPAN_NAME}" "${NEW_ATTRIBUTES}" "$DEPTH"
 exitcode=$?
 if [[ exitcode -ne 0 ]]; then
     echo "'$SPAN_NAME' failed"
@@ -201,6 +213,7 @@ SPAN_NAME=s3_copy_complete
 TRACEPARENT=$root_store
 SRC_FILE="./file.txt"
 DST_FILE="s3://file_complete.txt"
+NEW_ATTRIBUTES="${ATTRIBUTES},attribute1='process complete',attribute2='it should be working',src_file=$SRC_FILE,dst_file=$DST_FILE"
 span_function "copy_s3" "${SPAN_NAME}" "attribute1='process complete',attribute2='it should be working',src_file=$SRC_FILE,dst_file=$DST_FILE" "$SRC_FILE" "$DST_FILE"
 
 # not working

@@ -1,13 +1,15 @@
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
+import { trace, context, Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 import * as axios from 'axios'
 import https from 'https'
 
 // tracer for the file
+//const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
+//const tracer = trace.getTracer(servicename)
 const tracerName = 'default'
-const tracer = opentelemetry.trace.getTracer(tracerName)
+const tracer = trace.getTracer(tracerName)
 
 // create a random integer
 function getRandomInt(max: number): number {
@@ -17,7 +19,7 @@ function getRandomInt(max: number): number {
 // sleep for a period of time and create a child off passed in span
 function sleep(ms: number, parentSpan: Span) {
   // const parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
+  const ctx = trace.setSpan(context.active(), parentSpan)
   const activeSpan = tracer.startSpan('sleep', undefined, ctx)
   activeSpan?.setAttribute('time', ms)
 
@@ -33,7 +35,7 @@ function sleep(ms: number, parentSpan: Span) {
 
 // use http module to request data (for auto instrumentation tests)
 async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
+  const ctx = trace.setSpan(context.active(), parentSpan)
   const activeSpan = tracer.startSpan('httpsFetchUrl', undefined, ctx)
 
   return new Promise((resolve, reject) => {
@@ -85,7 +87,7 @@ async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
 
 // use axios to fetch data and attach span to parent
 async function fetchUrl(url: string, parentSpan: Span) {
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
+  const ctx = trace.setSpan(context.active(), parentSpan)
   const activeSpan = tracer.startSpan('fetchUrl', undefined, ctx)
 
   return new Promise((resolve, reject) => {
@@ -165,20 +167,13 @@ async function fetchFactsInternalSpan() {
   })
 }
 
-export async function main(): Promise<string> {
-  // configure honeycomb
-  const apikey = process.env.HONEYCOMB_APIKEY ?? ''
-  const dataset = process.env.HONEYCOMB_DATASET ?? ''
-  const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
-  await configureHoneycomb(apikey, dataset, servicename)
-
+async function program() {
   // Create the root span for app
   const activeSpan = tracer.startSpan('main')
-  if (activeSpan == undefined) {
-    logger.error('No active span')
-  }
+  activeSpan?.setAttribute('args', process.argv)
+
   // set parent span
-  opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+  trace.setSpan(context.active(), activeSpan)
 
   activeSpan?.setAttribute('pino', `${logger.version}`)
   logger.info(`Pino:${logger.version}`)
@@ -190,7 +185,7 @@ export async function main(): Promise<string> {
     const sleeping = sleep(getRandomInt(2000), activeSpan)
 
     // create a span in the loop
-    const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+    const ctx = trace.setSpan(context.active(), activeSpan)
     const fetchSpan = tracer.startSpan('fetchFacts', undefined, ctx)
     await fetchFacts()
     fetchSpan?.end()
@@ -230,6 +225,17 @@ export async function main(): Promise<string> {
   }
 
   activeSpan?.end()
+}
+
+export async function main(): Promise<string> {
+  // configure honeycomb
+  const apikey = process.env.HONEYCOMB_APIKEY ?? ''
+  const dataset = process.env.HONEYCOMB_DATASET ?? ''
+  const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''  
+  await configureHoneycomb(apikey, dataset, servicename)
+
+  // call the program
+  await program()
 
   return new Promise((resolve, reject) => {
     logger.info('Attempting shutdown')

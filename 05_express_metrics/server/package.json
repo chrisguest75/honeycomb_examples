@@ -1,0 +1,69 @@
+{
+  "name": "05_express_metrics",
+  "version": "1.0.0",
+  "description": "Demonstrates a simple Express app with Metrics using OpenTelemetry.",
+  "main": "./src/index.js",
+  "scripts": {
+    "clean": "rimraf ./build",
+    "build": "npm run clean && tsc",
+    "start": "npm run build && node build/src/index.js",
+    "rebuild": "npm run build && node build/src/index.js",
+    "dev": "concurrently \"nodemon\" \"nodemon -x tsoa spec\"",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "docker:build": "docker build --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 05_express_metrics .",
+    "docker:run": "npm run docker:build && docker run --env-file ./.env -p 8000:8000 --rm -it --name 05_express_metrics 05_express_metrics",
+    "docker:rebuild": "docker build --no-cache --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 05_express_metrics .",
+    "docker:stop": "docker stop 05_express_metrics"    
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src",
+      "nodemon.json",
+      "tsconfig.json",
+      "package.json"
+    ],
+    "ext": "ts",
+    "ignore": [],
+    "exec": "ts-node ./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/express-pino-logger": "^4.0.3",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.22",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "concurrently": "^7.0.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.5.1",
+    "jest-express": "^1.12.0",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.5.9",
+    "@opentelemetry/auto-instrumentations-node": "^0.28.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.27.0",
+    "@opentelemetry/sdk-node": "^0.27.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-pino-logger": "^7.0.0",
+    "express-prom-bundle": "^6.4.1",
+    "pino": "^7.9.2",
+    "prom-client": "^14.0.1"
+  }
+}

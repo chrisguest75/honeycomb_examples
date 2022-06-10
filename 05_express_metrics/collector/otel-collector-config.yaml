@@ -23,6 +23,7 @@ exporters:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": "${HONEYCOMB_APIKEY}"
+      "x-honeycomb-dataset": "${HONEYCOMB_SERVICENAME}"
 
   otlp/metrics:
     endpoint: "api.honeycomb.io:443"

@@ -5,6 +5,7 @@ services:
       command: ["--config=/etc/otel-collector-config.yaml", ""]
       environment:
         - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+        - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}
       volumes:
         - ./collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
       ports:

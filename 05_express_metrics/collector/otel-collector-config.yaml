@@ -1,20 +1,48 @@
 receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "prometheus"
+          honor_timestamps: true
+          scrape_interval: 15s
+          scrape_timeout: 10s
+          metrics_path: /metrics
+          scheme: http
+          static_configs:          
+            - targets: ["server:8000"] # this is the endpoint to scrape
+
   otlp:
     protocols:
       grpc: # on port 4317
+
 processors:
   batch:
+
 exporters:
   otlp:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": "${HONEYCOMB_APIKEY}"
+
+  otlp/metrics:
+    endpoint: "api.honeycomb.io:443"
+    headers:
+      "x-honeycomb-team": "${HONEYCOMB_APIKEY}"
+      "x-honeycomb-dataset": "test-metrics"
+
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp]
+
+    metrics:
+      #receivers: [hostmetrics,prometheus]
+      receivers: [prometheus]
+      processors: []
+      exporters: [otlp/metrics]
+
   telemetry:
     logs:
       level: "debug"

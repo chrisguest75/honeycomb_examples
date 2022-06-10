@@ -72,6 +72,8 @@ artillery quick -n 10 -c 1 http://0.0.0.0:8000/ping
 ## Resources
 
 * express prometheus bundle [here](https://www.npmjs.com/package/express-prom-bundle)  
+* https://docs.honeycomb.io/getting-data-in/metrics/prometheus/
+
 * Metrics Overview https://docs.honeycomb.io/getting-data-in/metrics/
 * Host Metrics https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-collector-host-metrics/
 * App Metrics with OTel SDKs - https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/
@@ -79,3 +81,4 @@ artillery quick -n 10 -c 1 http://0.0.0.0:8000/ping
 * https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
 * https://medium.com/google-cloud/custom-metrics-in-node-js-with-opentelemetry-and-prometheus-c10c8c0204d3
 
+https://github.com/chrisguest75/prometheus_examples/blob/master/03_nodejs_express_service/prometheus.yml

@@ -8,9 +8,7 @@ NOTES:
 
 TODO:
 
-* /metrics does not work inside container.  Guessing binding to wrong interface
-* Add collector https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
-* Switch to OTEL libraries?
+* Add extra routes (error, sleep with parameter)
 
 ## Run (server)
 
@@ -79,6 +77,7 @@ artillery quick -n 10 -c 1 http://0.0.0.0:8000/ping
 * App Metrics with OTel SDKs - https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/
 * https://www.npmjs.com/package/@opentelemetry/metrics
 * https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
+
 * https://medium.com/google-cloud/custom-metrics-in-node-js-with-opentelemetry-and-prometheus-c10c8c0204d3
 
 https://github.com/chrisguest75/prometheus_examples/blob/master/03_nodejs_express_service/prometheus.yml

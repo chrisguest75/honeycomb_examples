@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-    && apt-get install -fy -qq --no-install-recommends ca-certificates curl \
+    && apt-get install -fy -qq --no-install-recommends ca-certificates curl apache2-utils \
     && apt-get clean 
 
 COPY <<EOF /bin/timeout.sh

@@ -20,6 +20,10 @@ curl 0.0.0.0:8000/ping
 curl 0.0.0.0:8000/sleep
 curl 0.0.0.0:8000/metrics 
 ab -n 20 -c 2 http://0.0.0.0:8000/  
+
+# docker build
+npm run docker:build
+npm run docker:run
 ```
 
 ## How to recreate

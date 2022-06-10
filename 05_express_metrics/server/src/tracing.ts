@@ -1,3 +1,5 @@
+import { logger } from './logger'
+import process from 'process'
 import { Metadata, credentials } from '@grpc/grpc-js'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
@@ -6,9 +8,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-
-import { logger } from './logger'
-import process from 'process'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -28,12 +27,23 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
   }
 
-  logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
+  logger.info(`UNDEFINED:'${process.env.UNDEFINED}'`)
+
+  const endpoint = process.env.COLLECTOR_ENDPOINT || 'grpc://api.honeycomb.io:443/'
+  let insecure = false
+  if (
+    process.env.ENABLE_INSECURE_COLLECTOR == undefined ||
+    process.env.ENABLE_INSECURE_COLLECTOR.toLowerCase() == 'true'
+  ) {
+    insecure = true
+  }
+
+  logger.info(`'${servicename}' in '${dataset}' using '${apikey}' using endpoint '${endpoint}'`)
   metadata.set('x-honeycomb-team', apikey)
-  metadata.set('x-honeycomb-dataset', dataset)
+  //metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({
-    url: 'grpc://api.honeycomb.io:443/',
-    credentials: credentials.createSsl(),
+    url: endpoint,
+    credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
     metadata,
   })
 

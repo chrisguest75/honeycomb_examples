@@ -1,42 +1,51 @@
 version: "3.7"
 services:
-    # prometheus:
-    #     image: prom/prometheus
-    #     ports:
-    #         - "9090:9090"  
-    #     volumes:
-    #         - "prometheus-data-volume:/prometheus"
-    #         - "./prometheus.yml:/etc/prometheus/prometheus.yml"  
-    #         - "./custom-targets.json:/etc/prometheus/custom-targets.json"                                
-    #     deploy:
-    #         restart_policy:
-    #             condition: on-failure
-    #     networks:
-    #         - overlay                
+    collector:
+      image: otel/opentelemetry-collector-contrib:0.50.0
+      command: ["--config=/etc/otel-collector-config.yaml", ""]
+      environment:
+        - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+      volumes:
+        - ./collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      ports:
+        - "1888:1888"   # pprof extension
+        - "8888:8888"   # Prometheus metrics exposed by the collector
+        - "8889:8889"   # Prometheus exporter metrics
+        - "13133:13133" # health_check extension
+        - "4317:4317"        # OTLP gRPC receiver
+        - "4318:4318"        # OTLP http receiver
+        - "55670:55679" # zpages extension
+      networks:
+        - service_bridge  
+      profiles: [all, collector, collectoronly]    
 
     server:
-        build: 
-            context: ./server
-            dockerfile: Dockerfile
-        env_file: ./server/.env
-        ports:
-            - "8080:8000"   
-        deploy:
-            restart_policy:
-                condition: on-failure
+      build: 
+        context: ./server
+        dockerfile: Dockerfile
+      #environment:
+      #  - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}      
+      env_file: ./.env
+      ports:
+        - "8000:8000"   
+      deploy:
+        restart_policy:
+          condition: on-failure
 
-        networks:
-            - service_bridge  
+      networks:
+        - service_bridge  
+      profiles: [all, serveronly]    
 
     ubuntu:
-        build: 
-            context: ./ubuntu
-            dockerfile: Dockerfile
-        #entrypoint: "sleep"
-        command: "3000"
-        networks:
-            - service_bridge
+      build: 
+        context: ./ubuntu
+        dockerfile: Dockerfile
+      #entrypoint: "sleep"
+      command: "3000"
+      networks:
+        - service_bridge
+      profiles: [all, clientonly]    
 
 networks:
-    service_bridge:
-        driver: bridge
+  service_bridge:
+    driver: bridge

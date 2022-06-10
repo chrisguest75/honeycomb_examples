@@ -1,0 +1,56 @@
+config:
+  target: "http://0.0.0.0:8080"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: Warm up
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 300
+      arrivalRate: 50
+      name: Sustained load
+  variables:
+    waits:
+      - 10
+      - 6
+      - 5
+      - 2
+      - 0
+
+    errors:
+      - 200
+      - 301
+      - 302
+      - 400
+      - 404
+      - 501
+      - 502
+      - 503
+
+scenarios:
+  - name: "root"
+    flow:
+      - get:
+          url: "/"
+
+  - name: "ping"
+    flow:
+      - get:
+          url: "/ping"
+
+  - name: "sleep"
+    flow:
+      - get:
+          url: "/sleep"
+
+  # - name: "wait"
+  #   flow:
+  #     - get:
+  #         url: "/wait?wait={{ waits }}"
+
+  # - name: "error"
+  #   flow:
+  #     - get:
+  #         url: "/error?error={{ errors }}"

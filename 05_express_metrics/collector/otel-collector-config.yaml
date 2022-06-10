@@ -1,0 +1,20 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: # on port 4317
+processors:
+  batch:
+exporters:
+  otlp:
+    endpoint: "api.honeycomb.io:443"
+    headers:
+      "x-honeycomb-team": "${HONEYCOMB_APIKEY}"
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+  telemetry:
+    logs:
+      level: "debug"

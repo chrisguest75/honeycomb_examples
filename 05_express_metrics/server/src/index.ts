@@ -13,6 +13,8 @@ import pino from 'express-pino-logger'
 import { logger } from './logger'
 import bodyParser from 'body-parser'
 import { rootRouter } from '../routes/root'
+import { sleepRouter } from '../routes/sleep'
+import { pingRouter } from '../routes/ping'
 
 import * as promClient from 'prom-client'
 import promBundle from 'express-prom-bundle'
@@ -47,6 +49,8 @@ app.use(bodyParser.json())
 app.use(express.static('public'))
 app.use(pino())
 app.use('/', rootRouter)
+app.use('/sleep', sleepRouter)
+app.use('/ping', pingRouter)
 app.use(metricsMiddleware)
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

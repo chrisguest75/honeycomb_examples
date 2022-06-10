@@ -16,6 +16,8 @@ npm run lint
 
 # requests
 curl 0.0.0.0:8000 
+curl 0.0.0.0:8000/ping 
+curl 0.0.0.0:8000/sleep
 curl 0.0.0.0:8000/metrics 
 ab -n 20 -c 2 http://0.0.0.0:8000/  
 ```

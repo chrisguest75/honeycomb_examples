@@ -23,9 +23,8 @@ export async function shutdownHoneycomb() {
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
-  if (enableDiag.toLowerCase() == 'true') {
-    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
-  }
+  const diagLogger = new DiagConsoleLogger()
+  opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.ALL)
 
   logger.info(`UNDEFINED:'${process.env.UNDEFINED}'`)
 
@@ -89,4 +88,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     await shutdownHoneycomb()
     process.exit(1)
   })
+
+  if (enableDiag.toLowerCase() != 'true') {
+    logger.info('Set DiagConsoleLogger to DiagLogLevel.WARN')
+    opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.WARN)
+  }
 }

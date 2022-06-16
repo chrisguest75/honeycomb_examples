@@ -1,3 +1,5 @@
+import { logger } from './logger'
+import process from 'process'
 import { Metadata, credentials } from '@grpc/grpc-js'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
@@ -6,9 +8,6 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-
-import { logger } from './logger'
-import process from 'process'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -24,9 +23,8 @@ export async function shutdownHoneycomb() {
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
-  if (enableDiag.toLowerCase() == 'true') {
-    opentelemetry.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL)
-  }
+  const diagLogger = new DiagConsoleLogger()
+  opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.ALL)
 
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
   metadata.set('x-honeycomb-team', apikey)
@@ -79,4 +77,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     await shutdownHoneycomb()
     process.exit(1)
   })
+
+  if (enableDiag.toLowerCase() != 'true') {
+    logger.info('Set DiagConsoleLogger to DiagLogLevel.WARN')
+    opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.WARN)
+  }
 }

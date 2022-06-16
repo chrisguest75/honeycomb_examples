@@ -15,6 +15,8 @@ import bodyParser from 'body-parser'
 import { rootRouter } from '../routes/root'
 import { sleepRouter } from '../routes/sleep'
 import { pingRouter } from '../routes/ping'
+import { errorRouter } from '../routes/error'
+import { fetchRouter } from '../routes/fetch'
 
 import * as promClient from 'prom-client'
 import promBundle from 'express-prom-bundle'
@@ -52,7 +54,8 @@ app.use(pino())
 app.use('/', rootRouter)
 app.use('/sleep', sleepRouter)
 app.use('/ping', pingRouter)
-
+app.use('/error', errorRouter)
+app.use('/fetch', fetchRouter)
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
 process.on('SIGTERM', shutDown)

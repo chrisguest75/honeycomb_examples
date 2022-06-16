@@ -1,10 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { logger } from '../src/logger'
-import opentelemetry, { Span } from '@opentelemetry/api'
+import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
 import promClient from 'prom-client'
-const sleep_guage = new promClient.Gauge({
-  name: 'test_prometheus_sleep_time',
-  help: 'Sleep time',
+
+const sleep_gauge = new promClient.Gauge({
+  name: 'custom_sleep_wait_gauge',
+  help: 'sleep time gauge',
 })
 
 const router = express.Router()
@@ -18,11 +19,11 @@ function sleep(ms: number, parentSpan: Span) {
   const activeSpan = tracer.startSpan('sleep', undefined, ctx)
   activeSpan?.setAttribute('time', ms)
 
-  sleep_guage.set(ms)
+  sleep_gauge.set(ms)
 
   return new Promise((resolve) => {
-    activeSpan?.addEvent('About to sleep', { sleeptime: ms })
-    logger.info(`Sleep for ${ms}`)
+    activeSpan?.addEvent('about to sleep', { sleeptime: ms })
+    logger.info(`sleep for ${ms}`)
     setTimeout(() => {
       activeSpan?.end()
       resolve('Complete')
@@ -31,15 +32,30 @@ function sleep(ms: number, parentSpan: Span) {
 }
 
 // use underscores to ignore parameters
-const sleepHandler = async (_request: Request, response: Response, _next: NextFunction) => {
+const sleepHandler = async (request: Request, response: Response, _next: NextFunction) => {
   const activeSpan = tracer.startSpan('sleepHandler')
 
   logger.info(`sleepHandler ${activeSpan}`)
   activeSpan?.setAttribute('handler', 'sleepHandler')
-  const sleeping = sleep(500, activeSpan)
-  await sleeping
 
-  response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100) })
+  let wait = '500'
+  if (typeof request.query.wait === 'string') {
+    wait = request.query.wait
+  }
+
+  const random = Math.floor(Math.random() * 100)
+  activeSpan.setStatus({ code: SpanStatusCode.OK })
+  let status = 200
+  if (random % 42 == 0) {
+    status = 503
+    activeSpan?.addEvent('divisible by 42', { random: random })
+    activeSpan.setStatus({ code: SpanStatusCode.ERROR })
+  }
+
+  logger.info(`wait time:${wait}`)
+  const sleeping = sleep(parseInt(wait), activeSpan)
+  await sleeping
+  response.status(status).json({ message: 'sleep', random: random, wait: parseInt(wait) })
   activeSpan?.end()
 }
 

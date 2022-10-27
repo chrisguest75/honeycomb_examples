@@ -6,7 +6,7 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 
 let honeycombConfigured = false
@@ -39,7 +39,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
   const diagLogger = new DiagConsoleLogger()
-  opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.ALL)
+  diag.setLogger(diagLogger, DiagLogLevel.ALL)
 
   logger.info(`UNDEFINED:'${process.env.UNDEFINED}'`)
 
@@ -110,6 +110,6 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
 
   if (enableDiag.toLowerCase() != 'true') {
     logger.info('Set DiagConsoleLogger to DiagLogLevel.WARN')
-    opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.WARN)
+    diag.setLogger(diagLogger, DiagLogLevel.WARN)
   }
 }

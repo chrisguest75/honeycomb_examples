@@ -1,4 +1,4 @@
-import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
+import opentelemetry, { Exception, SpanStatusCode } from '@opentelemetry/api'
 import express, { Request, Response, NextFunction } from 'express'
 import { logger } from '../src/logger'
 import * as axios from 'axios'
@@ -61,19 +61,27 @@ const fetchGetHandler = async (request: Request, response: Response, _next: Next
   activeSpan?.end()
 }
 
-const fetchPostHandler = async (_request: Request, response: Response, _next: NextFunction) => {
+const fetchPostHandler = async (request: Request, response: Response, _next: NextFunction) => {
   const activeSpan = tracer.startSpan('fetchPostHandler')
-
   activeSpan?.setAttribute('handler', 'fetchPostHandler')
-  const url = _request.body
 
-  // https://dev.to/macmacky/get-better-with-typescript-using-express-3ik6
-  const body = JSON.stringify(_request.body)
-  logger.info(`fetchPostHandler ${body} ${url}`)
+  try {
+    // https://dev.to/macmacky/get-better-with-typescript-using-express-3ik6
+    //const body = JSON.stringify(request.body)
+    const { url = '' } = request.body
 
-  const resp = await fetchUrl(url)
-  response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100), resp: resp })
-  activeSpan?.end()
+    logger.info(`fetchPostHandler ${url}`)
+
+    const resp = await fetchUrl(url)
+    response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100), resp: resp })
+    activeSpan.setStatus({ code: SpanStatusCode.OK })
+  } catch (error) {
+    logger.error(error)
+    activeSpan.recordException(error as Exception)
+    activeSpan.setStatus({ code: SpanStatusCode.ERROR })
+  } finally {
+    activeSpan?.end()
+  }
 }
 
 router.get('/', fetchGetHandler)

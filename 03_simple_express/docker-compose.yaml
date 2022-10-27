@@ -1,0 +1,39 @@
+services:
+    service_a:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "5000:8000"              
+        environment:
+            - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+            - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_a
+            - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
+            - SERVICE_VERSION=${SERVICE_VERSION}
+            - ENABLE_INSECURE_COLLECTOR=${ENABLE_INSECURE_COLLECTOR}
+            - COLLECTOR_ENDPOINT=${COLLECTOR_ENDPOINT}
+        image: 03_service_a            
+        networks:
+            - service_bridge
+    service_b:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "5001:8000"            
+        environment:
+            - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+            - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_b
+            - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
+            - SERVICE_VERSION=${SERVICE_VERSION}
+            - ENABLE_INSECURE_COLLECTOR=${ENABLE_INSECURE_COLLECTOR}
+            - COLLECTOR_ENDPOINT=${COLLECTOR_ENDPOINT}
+        image: 03_service_b
+        networks:
+            - service_bridge
+
+
+networks:
+    service_bridge:
+        driver: bridge
+

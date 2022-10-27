@@ -4,7 +4,11 @@ Demonstrates a simple Express app with OpenTelemetry.
 
 TODO:
 
-* Propagation and an docker compose example to chain
+* multiple chains
+* adding traces to timers..
+* add tracing to jobprocessor
+* cleaning up the boiler plate.
+
 
 ## How to run (local)
 
@@ -51,7 +55,14 @@ docker compose up --env-file ./.env --build --force-recreate
 ```sh
 # return env variables
 curl http://localhost:5000
-curl http://localhost:5001
+curl http://localhost:5050
+curl http://localhost:5050/a/ping
+curl http://localhost:5050/b/ping
+
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ chain: [ {"url":"http://nginx:80/a/fetch", "payload":"{\"url\":\"http://nginx:80/b/ping\"}" }, {"url":"http://nginx:80/b/ping"} ] }' http://localhost:5000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://nginx:80/b/ping"}' http://localhost:5000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://nginx:80/c/ping"}' http://localhost:5000/fetch
+
 # sleep handler
 curl http://localhost:5000/sleep\?wait\=3000
 curl http://localhost:5001/sleep\?wait\=3000

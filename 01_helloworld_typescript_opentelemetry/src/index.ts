@@ -1,13 +1,18 @@
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
-import * as dotenv from 'dotenv'
+import opentelemetry, { ROOT_CONTEXT, Exception, Span, SpanStatusCode } from '@opentelemetry/api'
 import * as axios from 'axios'
 import https from 'https'
+import * as dotenv from 'dotenv'
 
-// tracer for the file
-const tracerName = 'default'
-const tracer = opentelemetry.trace.getTracer(tracerName)
+//const url = 'https://cat-fact.herokuapp.com/facts'
+
+// load config
+dotenv.config()
+const apikey = process.env.HONEYCOMB_APIKEY ?? ''
+const dataset = process.env.HONEYCOMB_DATASET ?? ''
+const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
+//let tracer = opentelemetry.trace.getTracer(servicename)
 
 // create a random integer
 function getRandomInt(max: number): number {
@@ -18,7 +23,7 @@ function getRandomInt(max: number): number {
 function sleep(ms: number, parentSpan: Span) {
   // const parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
-  const activeSpan = tracer.startSpan('sleep', undefined, ctx)
+  const activeSpan = opentelemetry.trace.getTracer(servicename).startSpan('sleep', undefined, ctx)
   activeSpan?.setAttribute('time', ms)
 
   return new Promise((resolve) => {
@@ -34,7 +39,7 @@ function sleep(ms: number, parentSpan: Span) {
 // use http module to request data (for auto instrumentation tests)
 async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
-  const activeSpan = tracer.startSpan('httpsFetchUrl', undefined, ctx)
+  const activeSpan = opentelemetry.trace.getTracer(servicename).startSpan('httpsFetchUrl', undefined, ctx)
 
   return new Promise((resolve, reject) => {
     const options = {
@@ -87,14 +92,13 @@ async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
 // use axios to fetch data and attach span to parent
 async function fetchUrl(url: string, parentSpan: Span) {
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
-  const activeSpan = tracer.startSpan('fetchUrl', undefined, ctx)
+  const activeSpan = opentelemetry.trace.getTracer(servicename).startSpan('fetchUrl', undefined, ctx)
 
   return new Promise((resolve, reject) => {
     axios.default
       .get(url)
       .then((resp) => {
-        logger.info(`statusCode: ${resp.status}`)
-        logger.info(resp)
+        logger.info(`statusCode: ${resp.status} size:${resp.data.length}`)
         activeSpan?.setAttribute('http_status', resp.status)
         // the data-length seems wrong
         activeSpan?.setAttribute('data-length', resp.data.length)
@@ -114,13 +118,12 @@ async function fetchUrl(url: string, parentSpan: Span) {
 }
 
 // use a span from outside the function
-async function fetchFacts() {
+async function fetchFacts(url = 'https://google.com/') {
   return new Promise((resolve, reject) => {
     axios.default
-      .get('https://cat-fact.herokuapp.com/facts')
+      .get(url)
       .then((resp) => {
-        logger.info(`statusCode: ${resp.status}`)
-        logger.info(resp)
+        logger.info(`statusCode: ${resp.status} size:${resp.data.length}`)
         resolve('Complete')
       })
 
@@ -132,22 +135,21 @@ async function fetchFacts() {
 }
 
 // try to create a span parented off current span without passing it in. (NOT WORKING )
-async function fetchFactsInternalSpan() {
-  /*let parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
-  //const parentSpan = undefined
+async function fetchFactsInternalSpan(url = 'https://google.com/') {
+  let parentSpan = opentelemetry.trace.getActiveSpan()
   if (parentSpan == undefined) {
     logger.warn(`No active parentspan assigning 'rootless' instead`)
-    parentSpan = tracer.startSpan('rootless', undefined, opentelemetry.context.active())
+    parentSpan = opentelemetry.trace
+      .getTracer(servicename)
+      .startSpan('rootless', undefined, opentelemetry.context.active())
   }
   const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parentSpan)
-  const activeSpan = tracer.startSpan('fetchFactsInternalSpan', undefined, ctx)*/
-  const activeSpan = tracer.startSpan('fetchFactsInternalSpan')
+  const activeSpan = opentelemetry.trace.getTracer(servicename).startSpan('fetchFactsInternalSpan', {}, ctx)
   return new Promise((resolve, reject) => {
     axios.default
-      .get('https://cat-fact.herokuapp.com/facts')
+      .get(url)
       .then((resp) => {
-        logger.info(`statusCode: ${resp.status}`)
-        logger.info(resp)
+        logger.info(`statusCode: ${resp.status} size:${resp.data.length}`)
         activeSpan?.setAttribute('http_status', resp.status)
         // the data-length seems wrong
         activeSpan?.setAttribute('data-length', resp.data.length)
@@ -166,71 +168,87 @@ async function fetchFactsInternalSpan() {
   })
 }
 
-export async function main(): Promise<string> {
-  // configure honeycomb
-  const apikey = process.env.HONEYCOMB_APIKEY ?? ''
-  const dataset = process.env.HONEYCOMB_DATASET ?? ''
-  const servicename = process.env.HONEYCOMB_SERVICENAME ?? ''
-  await configureHoneycomb(apikey, dataset, servicename)
-
-  // Create the root span for app
-  const activeSpan = tracer.startSpan('main')
-  if (activeSpan == undefined) {
-    logger.error('No active span')
-  }
-  // set parent span
-  opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
-
-  activeSpan?.setAttribute('pino', `${logger.version}`)
-  logger.info(`Pino:${logger.version}`)
-  activeSpan?.addEvent(`Starting main`)
-
+async function processing(rootSpan: Span) {
   // create some child spans
   for (let x = 0; x < getRandomInt(9) + 2; x++) {
     // pass activeSpan into a function
-    const sleeping = sleep(getRandomInt(2000), activeSpan)
+    const sleeping = sleep(getRandomInt(200), rootSpan)
 
     // create a span in the loop
-    const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
-    const fetchSpan = tracer.startSpan('fetchFacts', undefined, ctx)
-    await fetchFacts()
+    const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), rootSpan)
+    const fetchSpan = opentelemetry.trace.getTracer(servicename).startSpan('fetchFacts', undefined, ctx)
+    try {
+      const url = 'https://google.com/'
+      rootSpan?.addEvent(`Invoking fetchFacts(${url})`, { loopcount: x })
+      await fetchFacts(url)
+    } catch (error) {
+      logger.error(error)
+      rootSpan.recordException(error as Exception)
+    }
     fetchSpan?.end()
 
     // wait for sleep
     await sleeping
 
-    // call function that find parent
-    activeSpan?.addEvent('Invoking fetchFactsInternalSpan()', { loopcount: x })
-    await fetchFactsInternalSpan()
+    const fetchInternalSpan = opentelemetry.trace
+      .getTracer(servicename)
+      .startSpan('fetchFactsInternalSpan', undefined, ctx)
+    try {
+      const url = 'https://google.com/'
+      // call function that find parent
+      rootSpan?.addEvent('Invoking fetchFactsInternalSpan(url)', { loopcount: x })
+      await fetchFactsInternalSpan(url)
+    } catch (error) {
+      logger.error(error)
+      rootSpan.recordException(error as Exception)
+    }
+    fetchInternalSpan?.end()
 
     try {
       const url = `https://google.com/path`
-      activeSpan?.addEvent(`Invoking fetchUrl(${url})`, { loopcount: x })
-      await fetchUrl(url, activeSpan)
+      rootSpan?.addEvent(`Invoking fetchUrl(${url})`, { loopcount: x })
+      await fetchUrl(url, rootSpan)
     } catch (error) {
       logger.error(error)
     }
     try {
       const url = 'https://doesnotexist.doesnotexist'
-      activeSpan?.addEvent(`Invoking fetchUrl(${url})`, { loopcount: x })
-      await fetchUrl(url, activeSpan)
+      rootSpan?.addEvent(`Invoking fetchUrl(${url})`, { loopcount: x })
+      await fetchUrl(url, rootSpan)
     } catch (error) {
       logger.error(error)
     }
     try {
       const url = 'cat-fact.herokuapp.com'
       const path = '/facts'
-      activeSpan?.addEvent(`Invoking httpsFetchUrl(${url}${path})`, { loopcount: x })
-      await httpsFetchUrl(url, path, activeSpan)
+      rootSpan?.addEvent(`Invoking httpsFetchUrl(${url}${path})`, { loopcount: x })
+      await httpsFetchUrl(url, path, rootSpan)
     } catch (error) {
       logger.error(error)
     }
 
-    activeSpan?.addEvent(`Hello world event ${x}!!!!`)
+    rootSpan?.addEvent(`Hello world event ${x}!!!!`)
     logger.info(`Hello world event ${x}!!!!`)
   }
+}
 
-  activeSpan?.end()
+export async function main(): Promise<string> {
+  // configure honeycomb
+  await configureHoneycomb(apikey, dataset, servicename)
+
+
+  // Create the root span for app
+  const rootSpan = opentelemetry.trace.getTracer(servicename).startSpan('main', { root: true }, ROOT_CONTEXT)
+  // set parent span
+  
+
+  rootSpan?.setAttribute('pino', `${logger.version}`)
+  logger.info(`Pino:${logger.version}`)
+  rootSpan?.addEvent(`Starting main`)
+
+  await processing(rootSpan)
+
+  rootSpan?.end()
 
   return new Promise((resolve, reject) => {
     logger.info('Attempting shutdown')
@@ -244,9 +262,6 @@ export async function main(): Promise<string> {
       })
   })
 }
-
-// load config
-dotenv.config()
 
 main()
   .then(() => {

@@ -37,7 +37,7 @@ curl -X GET http://localhost:8000/fetch
 curl -X GET http://localhost:8000/fetch\?count\=6
 
 # this doesn't work right now as I need to get the types working correctly. 
-curl -X POST -d '{ "hello":"http://localhost:8000/ping"}' http://localhost:8000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://localhost:8000/ping"}' http://localhost:8000/fetch
 ```
 
 ## Start multiple service
@@ -63,7 +63,8 @@ curl -X GET http://localhost:5000/fetch\?count\=6
 curl -X GET http://localhost:5001/fetch\?count\=6
 
 # this doesn't work right now as I need to get the types working correctly. 
-curl -X POST -d '{ "url":"http://service_b:8000/ping"}' http://localhost:5000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://service_b:8000/ping"}' http://localhost:5000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://service_a:8000/ping"}' http://localhost:5001/fetch
 ```
 
 ## Debug docker

@@ -54,6 +54,7 @@ async function httpsFetchUrl(url: string, path: string, parentSpan: Span) {
         return reject(new Error('statusCode=' + res.statusCode))
       }
       // cumulate data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let body: any = []
       res.on('data', (chunk) => {
         body.push(chunk)
@@ -130,7 +131,7 @@ async function fetchFacts() {
   })
 }
 
-// try to create a span parented off current span without passing it in. (NOT WORKING ) 
+// try to create a span parented off current span without passing it in. (NOT WORKING )
 async function fetchFactsInternalSpan() {
   /*let parentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active())
   //const parentSpan = undefined

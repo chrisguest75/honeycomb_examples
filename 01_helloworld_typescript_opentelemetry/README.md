@@ -15,12 +15,16 @@ Contains:
 ## How to run
 
 ```sh
+nvm use
 npm install
+
+npm run lint
+npm run test
 
 # run targets
 npm run start:dev
-npm run test
-npm run lint
+
+open https://ui.honeycomb.io/
 ```
 
 ## How to recreate

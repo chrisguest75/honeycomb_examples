@@ -5,12 +5,32 @@ Demonstrates a simple Express app with OpenTelemetry.
 ## How to run
 
 ```sh
+nvm use
 npm install
 
-# run targets
-npm run start
-npm run test
 npm run lint
+npm run test
+
+# run targets
+. ./.env 
+npm run start:dev
+
+open https://ui.honeycomb.io/
+```
+
+## Testing
+
+```sh
+curl http://localhost:8000
+curl http://localhost:8000/sleep\?wait\=3000
+
+curl -X GET http://localhost:8000/fetch
+curl -X GET http://localhost:8000/fetch
+
+curl -X GET http://localhost:8000/fetch\?count\=6
+
+# this doesn't work right now as I need to get the types working correctly. 
+curl -X POST -d '{ "hello":"http://localhost:8000/ping"}' http://localhost:8000/fetch
 ```
 
 ## How to recreate
@@ -273,22 +293,6 @@ Copy the `./.env.template` to `./.env` and get APIKEY from [honeycomb account](h
 ```sh
 #test it
 npm run start:dev
-```
-
-## Testing
-
-```sh
-curl http://localhost:8000
-curl http://localhost:8000/sleep\?wait\=3000
-
-curl -X GET http://localhost:8000/fetch
-curl -X GET http://localhost:8000/fetch
-
-curl -X GET http://localhost:8000/fetch\?count\=6
-
-# this doesn't work right now as I need to get the types working correctly. 
-curl -X POST -d '{ "hello":"http://localhost:8000/ping"}' http://localhost:8000/fetch
-
 ```
 
 ## Resources

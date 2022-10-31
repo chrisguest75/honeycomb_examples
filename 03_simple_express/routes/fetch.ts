@@ -16,7 +16,7 @@ function getUrl(url: string) {
       .get(url)
       .then((resp) => {
         logger.info(`statusCode: ${resp.status}`)
-        logger.info(resp)
+        //logger.debug(resp)
         activeSpan?.setAttribute('http_status', resp.status)
         // the data-length seems wrong
         activeSpan?.setAttribute('data-length', resp.data.length)
@@ -35,7 +35,8 @@ function getUrl(url: string) {
   })
 }
 
-function postUrl(url: string, payload: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function postUrl(url: string, payload: any) {
   const activeSpan = tracer.startSpan('postUrl')
   activeSpan?.setAttribute('url', url)
 
@@ -44,7 +45,7 @@ function postUrl(url: string, payload: string) {
       .post(url, payload)
       .then((resp) => {
         logger.info(`statusCode: ${resp.status}`)
-        logger.info(resp)
+        //logger.debug(resp)
         activeSpan?.setAttribute('http_status', resp.status)
         // the data-length seems wrong
         activeSpan?.setAttribute('data-length', resp.data.length)
@@ -67,7 +68,7 @@ function postUrl(url: string, payload: string) {
 const fetchGetHandler = async (request: Request, response: Response, _next: NextFunction) => {
   const activeSpan = tracer.startSpan('fetchGetHandler')
 
-  logger.info(`fetchGetHandler ${activeSpan}`)
+  logger.info(`fetchGetHandler`)
   activeSpan?.setAttribute('handler', 'fetchGetHandler')
 
   let countStr = '1'
@@ -105,34 +106,33 @@ const fetchPostHandler = async (request: Request, response: Response, _next: Nex
   activeSpan?.setAttribute('handler', 'fetchPostHandler')
 
   try {
-    // https://dev.to/macmacky/get-better-with-typescript-using-express-3ik6
-    //const body = JSON.stringify(request.body)
     const { chain = [] } = request.body
     logger.info(`fetchPostHandler ${JSON.stringify(chain)}`)
+    activeSpan?.setAttribute('payload', `${JSON.stringify(chain)}`)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const resp: Array<any> = []
+    const responses: Array<any> = []
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises = chain.map(async (item: { url: string; payload: any }) => {
-      logger.info(item)
       if (item.payload) {
-        const rep = await postUrl(item.url, JSON.stringify(item.payload))
-        resp.push(rep)
-        logger.info(`${JSON.stringify(rep)} ${JSON.stringify(resp)}`)
+        logger.info(`fetch payload ${JSON.stringify(item.payload)}`)
+        const rep = await postUrl(item.url, item.payload)
+        responses.push({ url: item.url, payload: item.payload, response: rep })
+        //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
       } else {
         const rep = await getUrl(item.url)
-        resp.push(rep)
-        logger.info(`${JSON.stringify(rep)} ${JSON.stringify(resp)}`)
+        responses.push({ url: item.url, response: rep })
+        //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
       }
     })
     await Promise.all(promises)
-    logger.info(`final resp ${JSON.stringify(resp)}`)
+    logger.info(`final resp ${JSON.stringify(responses)}`)
     response.status(200).json({
       route: 'fetch',
       verb: 'post',
       message: 'pong',
       random: Math.floor(Math.random() * 100),
-      response: JSON.stringify(resp),
+      response: responses,
     })
     activeSpan.setStatus({ code: SpanStatusCode.OK })
   } catch (error) {

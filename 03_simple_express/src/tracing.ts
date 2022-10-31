@@ -11,6 +11,7 @@ import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
 import { ExpressLayerType } from '@opentelemetry/instrumentation-express'
 
 let honeycombConfigured = false
+
 const metadata = new Metadata()
 let sdk: NodeSDK | null = null
 

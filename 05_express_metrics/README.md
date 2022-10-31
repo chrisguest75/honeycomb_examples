@@ -8,11 +8,13 @@ NOTES:
 
 TODO:
 
-* Add extra routes (error, sleep with parameter)
 
-## Run (server)
+
+## Run locally for development (server)
 
 ```sh
+docker compose --env-file ./.env --profile collectoronly up -d --build --force-recreate
+
 # install
 cd ./server
 nvm use
@@ -27,7 +29,11 @@ npm run lint
 curl 0.0.0.0:8000 
 curl 0.0.0.0:8000/ping 
 curl 0.0.0.0:8000/sleep
+curl 0.0.0.0:8000/error
+curl -v 0.0.0.0:8000/error\?error=507         
 curl 0.0.0.0:8000/metrics 
+curl -X GET -v 0.0.0.0:8000/fetch\?count=10   
+curl -X POST --data 'https://google.com' -v 0.0.0.0:8000/fetch\?count=10   
 ab -n 20 -c 2 http://0.0.0.0:8000/  
 ```
 
@@ -42,7 +48,7 @@ docker compose --env-file ./.env --profile all up -d --build --force-recreate
 
 # get the server logs 
 docker compose logs server 
-docker compose logs collector
+docker compose logs collector -f
 
 docker compose exec -it ubuntu bash   
 ab -n 20 -c 2 http://server:8000/sleep
@@ -70,6 +76,7 @@ artillery quick -n 10 -c 1 http://0.0.0.0:8000/ping
 ## Resources
 
 * express prometheus bundle [here](https://www.npmjs.com/package/express-prom-bundle)  
+* https://github.com/siimon/prom-client
 * https://docs.honeycomb.io/getting-data-in/metrics/prometheus/
 
 * Metrics Overview https://docs.honeycomb.io/getting-data-in/metrics/

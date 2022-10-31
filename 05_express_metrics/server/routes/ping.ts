@@ -3,11 +3,11 @@ import { logger } from '../src/logger'
 import opentelemetry, { SpanStatusCode } from '@opentelemetry/api'
 import promClient from 'prom-client'
 const pong_counter = new promClient.Counter({
-  name: 'test_prometheus_pongs_generated',
+  name: 'custom_ping_pongs_generated',
   help: 'Number of pongs generated',
 })
-const pong_guage = new promClient.Gauge({
-  name: 'test_prometheus_random_value',
+const pong_gauge = new promClient.Gauge({
+  name: 'custom_ping_random_value',
   help: 'Random value',
 })
 
@@ -24,7 +24,7 @@ const pingHandler = async (_request: Request, response: Response, _next: NextFun
 
   pong_counter.inc(1)
   const random = Math.floor(Math.random() * 100)
-  pong_guage.set(random)
+  pong_gauge.set(random)
   activeSpan.setStatus({ code: SpanStatusCode.OK })
   let status = 200
   if (random % 42 == 0) {

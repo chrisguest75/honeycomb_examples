@@ -2,6 +2,35 @@
 
 Demonstrate using tracing with the `otel-collector` as a sidecar.  
 
+TODO:
+
+* httpotel
+
+```sh
+otlphttp:
+    endpoint: "https://api.honeycomb.io"
+    headers:
+      "x-honeycomb-team": '{{API_KEY}}'
+      'x-honeycomb-dataset': 'trint-dev-collector-apollo-test-delete-me'
+    timeout: 10s
+    compression: gzip
+```
+
+* logs 
+
+```sh
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    logs:
+      receivers: [otlp]
+      exporters: [otlp]
+
+```
+
 NOTES:
 
 * When running as sidecar you need to instantiate the insecure connection.  
@@ -50,3 +79,4 @@ npm run start:dev
 * OpenTelemetry Collector Configuration [here](https://opentelemetry.io/docs/collector/configuration/)
 * otel/opentelemetry-collector-contrib dockerhub tags [here](https://hub.docker.com/r/otel/opentelemetry-collector-contrib/tags)  
 
+* https://github.com/open-telemetry/opentelemetry-collector

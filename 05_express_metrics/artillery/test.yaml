@@ -13,9 +13,11 @@ config:
       name: Sustained load
   variables:
     waits:
-      - 10
-      - 6
-      - 5
+      - 10000
+      - 3000
+      - 1000
+      - 60
+      - 50
       - 2
       - 0
 
@@ -28,6 +30,15 @@ config:
       - 501
       - 502
       - 503
+
+    fetch_count:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
 
 scenarios:
   - name: "root"
@@ -43,14 +54,14 @@ scenarios:
   - name: "sleep"
     flow:
       - get:
-          url: "/sleep"
+          url: "/sleep?wait={{ waits }}"
 
-  # - name: "wait"
-  #   flow:
-  #     - get:
-  #         url: "/wait?wait={{ waits }}"
+  - name: "error"
+    flow:
+      - get:
+          url: "/error?error={{ errors }}"
 
-  # - name: "error"
-  #   flow:
-  #     - get:
-  #         url: "/error?error={{ errors }}"
+  - name: "fetch"
+    flow:
+      - get:
+          url: "/fetch?count={{ fetch_count }}"

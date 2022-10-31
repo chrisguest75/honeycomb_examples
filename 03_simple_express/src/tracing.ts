@@ -6,32 +6,60 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { ExpressLayerType } from '@opentelemetry/instrumentation-express'
+
+let honeycombConfigured = false
 
 const metadata = new Metadata()
-let sdk: any = null
+let sdk: NodeSDK | null = null
 
 export async function shutdownHoneycomb() {
   logger.info('shutdownHoneycomb')
-  await sdk
-    .shutdown()
-    .then(() => logger.info('Tracing terminated'))
-    .catch((error: Error) => logger.error('Error terminating tracing', error))
+  if (honeycombConfigured == true) {
+    await sdk
+      ?.shutdown()
+      .then(() => logger.info('Tracing terminated'))
+      .catch((error: Error) => logger.error('Error terminating tracing', error))
+    honeycombConfigured = false
+  }
+}
+
+export async function quitProcess() {
+  try {
+    logger.info('quitProcess')
+    await shutdownHoneycomb()
+  } catch (shutdownError) {
+    logger.error(shutdownError)
+  } finally {
+    process.exit(0)
+  }
 }
 
 export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
   const diagLogger = new DiagConsoleLogger()
-  opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.ALL)
+  diag.setLogger(diagLogger, DiagLogLevel.ALL)
 
-  logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
+  logger.info(`UNDEFINED:'${process.env.UNDEFINED}'`)
+
+  const endpoint = process.env.COLLECTOR_ENDPOINT || 'grpc://api.honeycomb.io:443/'
+  let insecure = false
+  if (
+    process.env.ENABLE_INSECURE_COLLECTOR == undefined ||
+    process.env.ENABLE_INSECURE_COLLECTOR.toLowerCase() == 'true'
+  ) {
+    insecure = true
+  }
+
+  logger.info(`'${servicename}' in '${dataset}' using '${apikey}' using endpoint '${endpoint}'`)
   metadata.set('x-honeycomb-team', apikey)
-  metadata.set('x-honeycomb-dataset', dataset)
+  //metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({
-    url: 'grpc://api.honeycomb.io:443/',
-    credentials: credentials.createSsl(),
+    url: endpoint,
+    credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
     metadata,
   })
 
@@ -51,7 +79,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
             span.setAttribute('instrumentation-http', 'true')
           },
         },
-        '@opentelemetry/instrumentation-express': {},
+        '@opentelemetry/instrumentation-express': {
+          ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.ROUTER, ExpressLayerType.REQUEST_HANDLER],
+        },
       }),
       new HttpInstrumentation(),
     ],
@@ -60,26 +90,30 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   await sdk
     .start()
     .then(() => {
+      honeycombConfigured = true
       logger.info('Tracing initialized')
-      const activeSpan = opentelemetry.trace
-        .getTracer(servicename)
-        .startSpan('init', undefined, opentelemetry.context.active())
-      activeSpan?.addEvent('Tracing initialized', {})
-      activeSpan?.end()
+      // rootSpan = opentelemetry.trace.getTracer(servicename).startSpan('init', undefined, opentelemetry.context.active())
+      // rootSpan?.addEvent('Tracing initialized', {})
+      // rootSpan?.end()
     })
     .catch((error: Error) => logger.error('Error initializing tracing', error))
 
-  process.on('exit', shutdownHoneycomb)
-  process.on('SIGINT', shutdownHoneycomb)
-  process.on('SIGTERM', shutdownHoneycomb)
+  //process.on('exit', quitProcess)
+  process.on('SIGINT', quitProcess)
+  process.on('SIGTERM', quitProcess)
   process.on('uncaughtException', async (error) => {
-    logger.error(error)
-    await shutdownHoneycomb()
-    process.exit(1)
+    try {
+      logger.error(error)
+      await shutdownHoneycomb()
+    } catch (shutdownError) {
+      logger.error(shutdownError)
+    } finally {
+      process.exit(1)
+    }
   })
 
   if (enableDiag.toLowerCase() != 'true') {
     logger.info('Set DiagConsoleLogger to DiagLogLevel.WARN')
-    opentelemetry.diag.setLogger(diagLogger, DiagLogLevel.WARN)
+    diag.setLogger(diagLogger, DiagLogLevel.WARN)
   }
 }

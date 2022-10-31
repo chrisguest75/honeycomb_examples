@@ -24,15 +24,23 @@ function sleep(ms: number, parentSpan: Span) {
 }
 
 // use underscores to ignore parameters
-const sleepHandler = async (_request: Request, response: Response, _next: NextFunction) => {
+const sleepHandler = async (request: Request, response: Response, _next: NextFunction) => {
   const activeSpan = tracer.startSpan('sleepHandler')
 
   logger.info(`sleepHandler ${activeSpan}`)
   activeSpan?.setAttribute('handler', 'sleepHandler')
-  const sleeping = sleep(500, activeSpan)
+  let wait = '500'
+  if (typeof request.query.wait === 'string') {
+    wait = request.query.wait
+  }
+
+  logger.info(`wait time:${wait}`)
+  const sleeping = sleep(parseInt(wait), activeSpan)
   await sleeping
 
-  response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100) })
+  response
+    .status(200)
+    .json({ route: 'sleep', verb: 'get', message: 'pong', wait: wait, random: Math.floor(Math.random() * 100) })
   activeSpan?.end()
 }
 

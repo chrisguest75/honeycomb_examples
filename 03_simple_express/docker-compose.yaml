@@ -1,0 +1,75 @@
+services:
+    nginx:
+        image: "nginx:1.20.1"
+        volumes:
+            - type: bind
+              source: ./default.conf
+              target: /etc/nginx/templates/default.conf.template
+            - type: bind
+              source: ./nginx.conf
+              target: /etc/nginx/nginx.conf              
+        environment:
+            - VERSION=nginx:1.20.1
+        ports:
+            - "5050:80"
+        networks:
+            - service_bridge
+        depends_on:
+           - backend_a    
+           - backend_b    
+
+    backend_a:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        #ports:
+        #    - "5000:8000"              
+        environment:
+            - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+            - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_backenda
+            - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
+            - SERVICE_VERSION=${SERVICE_VERSION}
+            - ENABLE_INSECURE_COLLECTOR=${ENABLE_INSECURE_COLLECTOR}
+            - COLLECTOR_ENDPOINT=${COLLECTOR_ENDPOINT}
+        image: 03_backend_a            
+        networks:
+            - service_bridge
+
+    backend_b:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        #ports:
+        #    - "5001:8000"            
+        environment:
+            - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+            - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_backendb
+            - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
+            - SERVICE_VERSION=${SERVICE_VERSION}
+            - ENABLE_INSECURE_COLLECTOR=${ENABLE_INSECURE_COLLECTOR}
+            - COLLECTOR_ENDPOINT=${COLLECTOR_ENDPOINT}
+        image: 03_service_b
+        networks:
+            - service_bridge
+
+    frontend_a:
+        build: 
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "5000:8000"              
+        environment:
+            - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
+            - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_frontenda
+            - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
+            - SERVICE_VERSION=${SERVICE_VERSION}
+            - ENABLE_INSECURE_COLLECTOR=${ENABLE_INSECURE_COLLECTOR}
+            - COLLECTOR_ENDPOINT=${COLLECTOR_ENDPOINT}
+        image: 03_frontend_a            
+        networks:
+            - service_bridge
+
+networks:
+    service_bridge:
+        driver: bridge
+

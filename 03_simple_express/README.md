@@ -55,10 +55,15 @@ curl http://localhost:5050
 curl http://localhost:5050/a/ping
 curl http://localhost:5050/b/ping
 
+# ping 
 curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/c/ping"} ] }' http://localhost:5000/fetch | jq .
 
-# chaining example.
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/a/fetch", "payload":{ "chain": [ {"url":"https://www.google.com" },{"url":"http://nginx:80/a/" },{"url":"http://nginx:80/b/fetch?count=6" },{"url":" http://nginx:80/c/sleep?wait=3000" }  ] }}, {"url":"http://nginx:80/a/ping"},{"url":"https://www.google.com" }] }' http://localhost:5000/fetch | jq .
+# error
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/error?error=507"}] }' http://localhost:5000/fetch | jq .
+
+# deep chaining example.
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/a/fetch", "payload":{ "chain": [ {"url":"https://www.google.com" },{"url":"http://nginx:80/a/" },{"url":"http://nginx:80/c/error?error=503"},{"url":"http://nginx:80/b/fetch?count=6" },{"url":" http://nginx:80/c/sleep?wait=3000" }  ] }}, {"url":"http://nginx:80/a/ping"},{"url":"https://www.google.com" }, {"url":"http://nginx:80/b/error?error=507"}] }' http://localhost:5000/fetch | jq .
+
 ```
 
 ```sh

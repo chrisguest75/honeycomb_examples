@@ -30,7 +30,7 @@ function getUrl(url: string) {
         activeSpan.recordException(error)
         activeSpan.setStatus({ code: SpanStatusCode.ERROR })
         activeSpan?.end()
-        reject('Error')
+        reject(error)
       })
   })
 }
@@ -59,7 +59,7 @@ function postUrl(url: string, payload: any) {
         activeSpan.recordException(error)
         activeSpan.setStatus({ code: SpanStatusCode.ERROR })
         activeSpan?.end()
-        reject('Error')
+        reject(error)
       })
   })
 }
@@ -114,18 +114,22 @@ const fetchPostHandler = async (request: Request, response: Response, _next: Nex
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises = chain.map(async (item: { url: string; payload: any }) => {
-      if (item.payload) {
-        logger.info(`fetch payload ${JSON.stringify(item.payload)}`)
-        const rep = await postUrl(item.url, item.payload)
-        responses.push({ url: item.url, payload: item.payload, response: rep })
-        //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
-      } else {
-        const rep = await getUrl(item.url)
-        responses.push({ url: item.url, response: rep })
-        //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
+      try {
+        if (item.payload) {
+          logger.info(`fetch payload ${JSON.stringify(item.payload)}`)
+          const rep = await postUrl(item.url, item.payload)
+          responses.push({ url: item.url, payload: item.payload, response: rep })
+          //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
+        } else {
+          const rep = await getUrl(item.url)
+          responses.push({ url: item.url, response: rep })
+          //logger.info(`${JSON.stringify(rep)} ${JSON.stringify(responses)}`)
+        }
+      } catch (error) {
+        responses.push({ url: item.url, response: error })
       }
     })
-    await Promise.all(promises)
+    await Promise.allSettled(promises)
     logger.info(`final resp ${JSON.stringify(responses)}`)
     response.status(200).json({
       route: 'fetch',

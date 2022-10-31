@@ -4,11 +4,11 @@ Demonstrates a simple Express app with OpenTelemetry.
 
 TODO:
 
-* multiple chains
+* getUrl and postUrl are maybe not parented properly
+* sort out responses to be json
 * adding traces to timers..
 * add tracing to jobprocessor
 * cleaning up the boiler plate.
-
 
 ## How to run (local)
 
@@ -59,9 +59,9 @@ curl http://localhost:5050
 curl http://localhost:5050/a/ping
 curl http://localhost:5050/b/ping
 
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ chain: [ {"url":"http://nginx:80/a/fetch", "payload":"{\"url\":\"http://nginx:80/b/ping\"}" }, {"url":"http://nginx:80/b/ping"} ] }' http://localhost:5000/fetch
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://nginx:80/b/ping"}' http://localhost:5000/fetch
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://nginx:80/c/ping"}' http://localhost:5000/fetch
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/c/ping"} ] }' http://localhost:5000/fetch
+
+curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/a/fetch", "payload":{ "chain": [ {"url":"http://nginx:80/b/ping" },{"url":"http://nginx:80/a" } ] }}, {"url":"http://nginx:80/a/ping"}] }' http://localhost:5000/fetch
 
 # sleep handler
 curl http://localhost:5000/sleep\?wait\=3000
@@ -73,9 +73,6 @@ curl -X GET http://localhost:5001/fetch
 curl -X GET http://localhost:5000/fetch\?count\=6
 curl -X GET http://localhost:5001/fetch\?count\=6
 
-# this doesn't work right now as I need to get the types working correctly. 
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://service_b:8000/ping"}' http://localhost:5000/fetch
-curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "url":"http://service_a:8000/ping"}' http://localhost:5001/fetch
 ```
 
 ## Debug docker
@@ -111,3 +108,4 @@ npm run start:dev
 
 * https://www.split.io/blog/node-js-typescript-express-tutorial/
 * https://github.com/tedsuo/otel-node-basics/blob/main/server.js
+* https://www.npmjs.com/package/@opentelemetry/instrumentation-express

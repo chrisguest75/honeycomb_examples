@@ -38,7 +38,9 @@ const sleepHandler = async (request: Request, response: Response, _next: NextFun
   const sleeping = sleep(parseInt(wait), activeSpan)
   await sleeping
 
-  response.status(200).json({ message: 'pong', wait: wait, random: Math.floor(Math.random() * 100) })
+  response
+    .status(200)
+    .json({ route: 'sleep', verb: 'get', message: 'pong', wait: wait, random: Math.floor(Math.random() * 100) })
   activeSpan?.end()
 }
 

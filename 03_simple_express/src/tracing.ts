@@ -8,6 +8,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { ExpressLayerType } from '@opentelemetry/instrumentation-express'
 
 let honeycombConfigured = false
 const metadata = new Metadata()
@@ -77,7 +78,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
             span.setAttribute('instrumentation-http', 'true')
           },
         },
-        '@opentelemetry/instrumentation-express': {},
+        '@opentelemetry/instrumentation-express': {
+          ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.ROUTER, ExpressLayerType.REQUEST_HANDLER],
+        },
       }),
       new HttpInstrumentation(),
     ],

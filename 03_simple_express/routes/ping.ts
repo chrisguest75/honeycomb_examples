@@ -10,10 +10,10 @@ const tracer = opentelemetry.trace.getTracer(tracerName)
 const pingHandler = async (_request: Request, response: Response, _next: NextFunction) => {
   const activeSpan = tracer.startSpan('pingHandler')
 
-  logger.info(`pingHandler ${activeSpan}`)
+  logger.info(`pingHandler`)
   activeSpan?.setAttribute('handler', 'pingHandler')
 
-  response.status(200).json({ message: 'pong', random: Math.floor(Math.random() * 100) })
+  response.status(200).json({ route: 'ping', verb: 'get', message: 'pong', random: Math.floor(Math.random() * 100) })
   activeSpan?.end()
 }
 

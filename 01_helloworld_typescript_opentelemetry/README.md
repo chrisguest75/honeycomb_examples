@@ -2,6 +2,12 @@
 
 Demonstrates a simple cmdline application (copy these steps)  
 
+TODO:
+
+* https://github.com/tedsuo/otel-node-basics/blob/main/server.js
+* Tidy up this code and use better tracing concepts.  
+* Add the recursive function and add get all the traces parented correctly.  
+
 Contains:
 
 * Hierarchical span creation
@@ -15,12 +21,17 @@ Contains:
 ## How to run
 
 ```sh
+nvm use
 npm install
 
-# run targets
-npm run start:dev
-npm run test
 npm run lint
+npm run test
+
+# run targets
+. ./.env 
+npm run start:dev
+
+open https://ui.honeycomb.io/
 ```
 
 ## How to recreate

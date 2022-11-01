@@ -22,6 +22,7 @@ npm run lint
 npm run test
 
 # run targets
+. ./.env 
 npm run start:dev
 
 open https://ui.honeycomb.io/

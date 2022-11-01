@@ -16,6 +16,8 @@ import { pingRouter } from '../routes/ping'
 import { sleepRouter } from '../routes/sleep'
 import { fetchRouter } from '../routes/fetch'
 import { errorRouter } from '../routes/error'
+import { bucketsRouter } from '../routes/buckets'
+import { jobsRouter } from '../routes/jobs'
 
 function shutDown() {
   return new Promise((resolve, reject) => {
@@ -44,6 +46,8 @@ app.use('/ping', pingRouter)
 app.use('/sleep', sleepRouter)
 app.use('/fetch', fetchRouter)
 app.use('/error', errorRouter)
+app.use('/job', jobsRouter)
+app.use('/buckets', bucketsRouter)
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 

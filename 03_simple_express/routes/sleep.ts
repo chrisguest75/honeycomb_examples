@@ -14,7 +14,7 @@ function sleep(ms: number, parentSpan: Span) {
   activeSpan?.setAttribute('time', ms)
 
   return new Promise((resolve) => {
-    activeSpan?.addEvent('About to sleep', { sleeptime: ms })
+    activeSpan?.addEvent('Sleeping', { sleeptime: ms })
     logger.info(`Sleep for ${ms}`)
     setTimeout(() => {
       activeSpan?.end()

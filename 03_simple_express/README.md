@@ -7,6 +7,10 @@ TODO:
 * adding traces to timers..
 * add tracing to jobprocessor
 * cleaning up the boiler plate.
+* add aws example
+* add fs instrumentation
+* filter tls.connect
+* host metrics
 
 ## How to run (local)
 
@@ -37,6 +41,45 @@ curl http://localhost:8000/sleep\?wait\=3000
 curl -X GET http://localhost:8000/fetch
 # chain 6 times
 curl -X GET http://localhost:8000/fetch\?count\=6
+
+
+
+
+
+# submit a job "directory to processs"
+curl -s -L -X POST -H "Content-Type: application/json" -d '{ "path":"./routes" }' http://localhost:8000/job/start | jq . 
+
+# get job progress and repeatedly invoke to get status
+curl -s -L -X GET  http://localhost:8000/job/progress | jq .
+
+# get progress of individual job.
+curl -s -L -X GET  http://localhost:8000/job/progress/dc59a552-66b4-459a-b48f-c7e2532da614 | jq .
+
+
+# list buckets
+curl -s http://localhost:8000/buckets | jq . 
+
+# watch bucket
+curl -s http://localhost:8000/buckets/watch/bucketname/path | jq .
+
+# sync files 
+curl -s http://localhost:8000/buckets/sync/bucketname/test
+
+# find copied files
+curl -s http://localhost:8000/buckets/list/bucketname/test | jq .  
+
+
+```
+
+## Build
+
+```sh
+# set profile
+export AWS_PROFILE=myprofile
+export AWS_REGION=us-east-1
+
+# build the image (with hardcoded profile for skaffold)
+docker buildx build --no-cache --progress=plain --build-arg AWS_PROFILE=$AWS_PROFILE --build-arg AWS_REGION=$AWS_REGION --build-context profile=/Users/${USER}/.aws -t awscli . 
 ```
 
 

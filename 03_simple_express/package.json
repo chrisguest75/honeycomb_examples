@@ -4,7 +4,7 @@
   "description": "Demonstrates a simple cmdline application (copy these steps)",
   "main": "./src/index.js",
   "scripts": {
-    "tsc": "tsc",    
+    "tsc": "tsc",
     "audit": "better-npm-audit audit",
     "clean": "rimraf build",
     "build": "tsc",
@@ -60,6 +60,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.200.0",
     "@grpc/grpc-js": "^1.5.7",
     "@opentelemetry/api": "^1.2.0",
     "@opentelemetry/auto-instrumentations-node": "^0.33.1",
@@ -70,6 +71,9 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "express-pino-logger": "^7.0.0",
-    "pino": "^7.8.1"
+    "md5-file": "^5.0.0",
+    "pino": "^7.8.1",
+    "pubsub-js": "^1.9.4",
+    "s3-sync-client": "^3.0.3"
   }
 }

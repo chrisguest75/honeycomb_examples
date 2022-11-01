@@ -8,6 +8,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
 import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+//import { FsInstrumentation } from '@opentelemetry/instrumentation-fs'
 import { ExpressLayerType } from '@opentelemetry/instrumentation-express'
 
 let honeycombConfigured = false
@@ -84,6 +85,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
         },
       }),
       new HttpInstrumentation(),
+      //new FsInstrumentation({}),
     ],
   })
 
@@ -104,6 +106,21 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   process.on('uncaughtException', async (error) => {
     try {
       logger.error(error)
+      await shutdownHoneycomb()
+    } catch (shutdownError) {
+      logger.error(shutdownError)
+    } finally {
+      process.exit(1)
+    }
+  })
+
+  process.on('unhandledRejection', async (reason, promise) => {
+    logger.error({
+      promise: promise,
+      reason: reason,
+      msg: 'Unhandled Rejection',
+    })
+    try {
       await shutdownHoneycomb()
     } catch (shutdownError) {
       logger.error(shutdownError)

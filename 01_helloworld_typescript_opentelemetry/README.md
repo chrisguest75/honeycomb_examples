@@ -2,6 +2,12 @@
 
 Demonstrates a simple cmdline application (copy these steps)  
 
+TODO:
+
+* https://github.com/tedsuo/otel-node-basics/blob/main/server.js
+* Tidy up this code and use better tracing concepts.  
+* Add the recursive function and add get all the traces parented correctly.  
+
 Contains:
 
 * Hierarchical span creation

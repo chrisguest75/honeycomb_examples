@@ -1,7 +1,24 @@
 # README
 
 Honeycomb examples using OpenTelemetry.  
+
 NOTE: Requires a free tier account in Honeycomb.  
+
+## Reason
+
+OpenTelemetry is an open-source framework for collecting, processing, and exporting telemetry data (metrics, traces, and logs) from your applications and infrastructure. Here are some reasons why you might want to consider using OpenTelemetry:  
+
+Standardization: OpenTelemetry provides a standardized way of collecting telemetry data across different programming languages, frameworks, and platforms. This makes it easier to get a unified view of your system's performance.  
+
+Flexibility: OpenTelemetry is flexible and customizable, allowing you to collect the telemetry data that's most important to your specific use case.  
+
+Interoperability: OpenTelemetry is designed to work seamlessly with other observability tools and platforms, such as Grafana, Prometheus, and Jaeger.  
+
+Community-driven: OpenTelemetry is developed by a large and active community of contributors, who are constantly improving and expanding the framework.  
+
+Future-proofing: As a vendor-neutral and open-source project, OpenTelemetry is not tied to any specific vendor or technology, making it a safe choice for future-proofing your observability stack.  
+
+In summary, OpenTelemetry provides a standardized, flexible, interoperable, community-driven, and future-proof way of collecting and exporting telemetry data from your applications and infrastructure.  
 
 TODO:
 

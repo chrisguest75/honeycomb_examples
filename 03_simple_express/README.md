@@ -1,6 +1,13 @@
 # README
 
-Demonstrates a simple Express app with OpenTelemetry.  
+Demonstrates an pure express based service using OpenTelemetry.  
+
+## Examples
+
+* Demonstrate chaining commands for simulated deep traces.  
+* Using OTEL instrumentations  
+* Dockerised builds  
+* Reverse proxy to load balance between two containers  
 
 TODO:
 
@@ -42,10 +49,6 @@ curl -X GET http://localhost:8000/fetch
 # chain 6 times
 curl -X GET http://localhost:8000/fetch\?count\=6
 
-
-
-
-
 # submit a job "directory to processs"
 curl -s -L -X POST -H "Content-Type: application/json" -d '{ "path":"./routes" }' http://localhost:8000/job/start | jq . 
 
@@ -67,8 +70,6 @@ curl -s http://localhost:8000/buckets/sync/bucketname/test
 
 # find copied files
 curl -s http://localhost:8000/buckets/list/bucketname/test | jq .  
-
-
 ```
 
 ## Build
@@ -98,10 +99,10 @@ curl http://localhost:5050
 curl http://localhost:5050/a/ping
 curl http://localhost:5050/b/ping
 
-# ping 
+# chaining ping 
 curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/c/ping"} ] }' http://localhost:5000/fetch | jq .
 
-# error
+# chaining error
 curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/error?error=507"}] }' http://localhost:5000/fetch | jq .
 
 # deep chaining example.
@@ -149,6 +150,8 @@ npm run start:dev
 
 ## Resources
 
-* https://www.split.io/blog/node-js-typescript-express-tutorial/
-* https://github.com/tedsuo/otel-node-basics/blob/main/server.js
-* https://www.npmjs.com/package/@opentelemetry/instrumentation-express
+* Build an API with Node.js, Express, and TypeScript [here](https://www.split.io/blog/node-js-typescript-express-tutorial/)
+* tedsuo/otel-node-basics [here](https://github.com/tedsuo/otel-node-basics/blob/main/server.js)
+* OpenTelemetry Express Instrumentation for Node.js [here](https://www.npmjs.com/package/@opentelemetry/instrumentation-express)  
+* OpenTelemetry Net module Instrumentation for Node.js [here](https://www.npmjs.com/package/@opentelemetry/instrumentation-net)  
+* Thoughts on HTTP instrumentation with OpenTelemetry [here](https://neskazu.medium.com/thoughts-on-http-instrumentation-with-opentelemetry-9fc22fa35bc7)  

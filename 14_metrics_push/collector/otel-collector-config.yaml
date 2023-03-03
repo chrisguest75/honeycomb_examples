@@ -1,31 +1,19 @@
 receivers:
-  prometheus:
-    config:
-      scrape_configs:
-        - job_name: "prometheus"
-          honor_timestamps: true
-          scrape_interval: 15s
-          scrape_timeout: 10s
-          metrics_path: /metrics
-          scheme: http
-          static_configs:          
-            - targets: ["${PROMETHEUS_COLLECTOR_TARGET}"] # this is the endpoint to scrape
-
-  hostmetrics:
-    scrapers:
-      cpu:
-      disk:
-      filesystem:
-      load:
-      memory:
-      network:
-      process:
-      processes:
-      paging:
-
   otlp:
     protocols:
       grpc: # on port 4317
+
+  # hostmetrics:
+  #   scrapers:
+  #     cpu:
+  #     disk:
+  #     filesystem:
+  #     load:
+  #     memory:
+  #     network:
+  #     process:
+  #     processes:
+  #     paging:
 
 processors:
   batch:
@@ -51,7 +39,8 @@ service:
       exporters: [otlp]
 
     metrics:
-      receivers: [hostmetrics,prometheus]
+      receivers: [otlp]
+      #receivers: [hostmetrics, otlp]
       processors: []
       exporters: [otlp/metrics]
 

@@ -14,8 +14,7 @@ TODO:
 
 * Pushing metrics directly rather than through collector.
 
-
-## Run locally for development 
+## Run locally for development
 
 ```sh
 # install

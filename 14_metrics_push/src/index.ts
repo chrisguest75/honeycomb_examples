@@ -1,6 +1,6 @@
 import { logger } from './logger'
 import { configureHoneycomb, shutdownHoneycomb } from './tracing'
-import opentelemetry, { Span, SpanStatusCode } from '@opentelemetry/api'
+import { trace, context, Span, SpanStatusCode } from '@opentelemetry/api'
 import * as dotenv from 'dotenv'
 import { promisify } from 'util'
 import { Metrics } from './metrics'
@@ -9,25 +9,33 @@ const sleep = promisify(setTimeout)
 
 // tracer for the file
 const tracerName = 'default'
-const tracer = opentelemetry.trace.getTracer(tracerName)
+const tracer = trace.getTracer(tracerName)
 
 async function work(activeSpan: Span, metrics: Metrics) {
   logger.info('Attempting shutdown')
   // create a span in the loop
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+  const ctx = trace.setSpan(context.active(), activeSpan)
   const workSpan = tracer.startSpan('doSomeWork', undefined, ctx)
 
   //do some stuff
   const loopCount = Math.floor(Math.random() * 100)
   for (let index = 0; index < loopCount; index++) {
-    const subctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), workSpan)
+    const subctx = trace.setSpan(context.active(), workSpan)
     const subWorkSpan = tracer.startSpan(`doSomeWork${index}`, undefined, subctx)
     logger.child({ index: index }).info('Doing some work')
-    await sleep(Math.random() * 1000)
+    const sleepTime = Math.random() * 1000
+    await sleep(sleepTime)
     metrics.getMetric('test_counter').add(1, metrics.getAttributes())
     metrics.getMetric('test_up_down_counter').add(Math.random() > 0.5 ? 1 : -1, metrics.getAttributes())
+    metrics.getHistogram('test_histogram').record(sleepTime, metrics.getAttributes())
     subWorkSpan?.end()
   }
+
+  /*const singleSpan = tracer.startSpan('files-series-info')
+  context.with(trace.setSpan(context.active(), singleSpan), async () => {
+    await sleep(Math.random() * 500)
+    singleSpan.end()
+  })*/
 
   workSpan?.end()
 }
@@ -48,7 +56,7 @@ export async function main(): Promise<string> {
     logger.error('No active span')
   }
   // set parent span
-  opentelemetry.trace.setSpan(opentelemetry.context.active(), activeSpan)
+  trace.setSpan(context.active(), activeSpan)
 
   activeSpan?.setAttribute('pino', `${logger.version}`)
   logger.info(`Pino:${logger.version}`)

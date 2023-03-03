@@ -11,10 +11,10 @@ Demonstrates an pure express based service using OpenTelemetry.
 
 TODO:
 
+* monitoring the long running processes
 * adding traces to timers..
 * add tracing to jobprocessor
 * cleaning up the boiler plate.
-* add aws example
 * add fs instrumentation
 * filter tls.connect
 * host metrics
@@ -107,6 +107,22 @@ curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"
 
 # deep chaining example.
 curl -vvv -s -L -X POST -H "Content-Type: application/json" -d  '{ "chain": [ {"url":"http://nginx:80/b/ping"}, {"url":"http://nginx:80/a/fetch", "payload":{ "chain": [ {"url":"https://www.google.com" },{"url":"http://nginx:80/a/" },{"url":"http://nginx:80/c/error?error=503"},{"url":"http://nginx:80/b/fetch?count=6" },{"url":" http://nginx:80/c/sleep?wait=3000" }  ] }}, {"url":"http://nginx:80/a/ping"},{"url":"https://www.google.com" }, {"url":"http://nginx:80/b/error?error=507"}] }' http://localhost:5000/fetch | jq .
+
+# list buckets
+curl -s http://localhost:5000/buckets | jq . 
+curl -s http://localhost:5050/a/buckets | jq . 
+curl -s http://localhost:5050/b/buckets | jq . 
+
+# watch bucket
+curl -s http://localhost:5000/buckets/watch/bucketname/path | jq .
+
+# sync files 
+curl -s http://localhost:5000/buckets/sync/bucketname/test
+
+# find copied files
+curl -s http://localhost:5000/buckets/list/chris-test-bucket-444/ | jq .  
+curl -s http://localhost:5050/a/buckets/list/chris-test-bucket-444/ | jq .
+curl -s http://localhost:5050/a/buckets/watch/chris-test-bucket-444/ | jq .
 
 ```
 

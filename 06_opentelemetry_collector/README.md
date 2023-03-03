@@ -11,7 +11,7 @@ otlphttp:
     endpoint: "https://api.honeycomb.io"
     headers:
       "x-honeycomb-team": '{{API_KEY}}'
-      'x-honeycomb-dataset': 'trint-dev-collector-apollo-test-delete-me'
+      'x-honeycomb-dataset': 'delete-me'
     timeout: 10s
     compression: gzip
 ```

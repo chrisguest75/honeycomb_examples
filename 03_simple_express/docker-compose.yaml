@@ -22,9 +22,14 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - type: bind
+              source: /Users/${USER}/.aws
+              target: /root/.aws
         #ports:
         #    - "5000:8000"              
         environment:
+            - AWS_PROFILE=${AWS_PROFILE}
             - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
             - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_backenda
             - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
@@ -39,9 +44,14 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - type: bind
+              source: /Users/${USER}/.aws
+              target: /root/.aws            
         #ports:
         #    - "5001:8000"            
         environment:
+            - AWS_PROFILE=${AWS_PROFILE}
             - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
             - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_backendb
             - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}
@@ -56,9 +66,14 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - type: bind
+              source: /Users/${USER}/.aws
+              target: /root/.aws            
         ports:
             - "5000:8000"              
         environment:
+            - AWS_PROFILE=${AWS_PROFILE}
             - HONEYCOMB_APIKEY=${HONEYCOMB_APIKEY}
             - HONEYCOMB_SERVICENAME=${HONEYCOMB_SERVICENAME}_frontenda
             - ENABLE_OTEL_DIAG=${ENABLE_OTEL_DIAG}

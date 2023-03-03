@@ -104,6 +104,12 @@ Demonstrate how to use serverless framework to deploy a non-bundled node functio
 
 [README.md](./13_lambda_js_opentelemetry/README.md)  
 
+## 14 - Metrics (push)
+
+Demonstrates pushing OTEL metrics rather than scraping them wih the collector.  
+
+[README.md](./14_metrics_push/README.md)  
+
 ## Resources
 
 ### Open Telemetry

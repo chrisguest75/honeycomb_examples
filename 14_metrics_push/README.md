@@ -1,6 +1,11 @@
 # README
 
-Demonstrates pushing metrics rather than scraping them.  
+Demonstrates pushing OTEL metrics rather than scraping them wih the collector.  
+
+## REASON
+
+Pushing metrics simplifies the configuration and architecture. Rather than mixing a push configuration for traces and a scrape configuration of metrics. We make both push. 
+This ensures that both the collector and the service do not need to know about each other.  
 
 NOTES:
 

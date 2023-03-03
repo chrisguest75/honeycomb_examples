@@ -6,8 +6,10 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
+//import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
 import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { ExpressLayerType } from '@opentelemetry/instrumentation-express'
 
 const metadata = new Metadata()
 let sdk: any = null
@@ -39,12 +41,17 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
 
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}' using endpoint '${endpoint}'`)
   metadata.set('x-honeycomb-team', apikey)
-  //metadata.set('x-honeycomb-dataset', dataset)
+  metadata.set('x-honeycomb-dataset', dataset)
   const traceExporter = new OTLPTraceExporter({
     url: endpoint,
     credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
     metadata,
   })
+  /*const metricExporter = new OTLPMetricExporter({
+    url: endpoint,
+    credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
+    metadata,
+  })*/
 
   const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
 
@@ -62,7 +69,9 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
             span.setAttribute('instrumentation-http', 'true')
           },
         },
-        '@opentelemetry/instrumentation-express': {},
+        '@opentelemetry/instrumentation-express': {
+          ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.ROUTER, ExpressLayerType.REQUEST_HANDLER],
+        },
       }),
       new HttpInstrumentation(),
     ],
@@ -84,9 +93,29 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   process.on('SIGINT', shutdownHoneycomb)
   process.on('SIGTERM', shutdownHoneycomb)
   process.on('uncaughtException', async (error) => {
-    logger.error(error)
-    await shutdownHoneycomb()
-    process.exit(1)
+    try {
+      logger.error(error)
+      await shutdownHoneycomb()
+    } catch (shutdownError) {
+      logger.error(shutdownError)
+    } finally {
+      process.exit(1)
+    }
+  })
+
+  process.on('unhandledRejection', async (reason, promise) => {
+    logger.error({
+      promise: promise,
+      reason: reason,
+      msg: 'Unhandled Rejection',
+    })
+    try {
+      await shutdownHoneycomb()
+    } catch (shutdownError) {
+      logger.error(shutdownError)
+    } finally {
+      process.exit(1)
+    }
   })
 
   if (enableDiag.toLowerCase() != 'true') {

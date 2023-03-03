@@ -9,7 +9,7 @@ receivers:
           metrics_path: /metrics
           scheme: http
           static_configs:          
-            - targets: ["server:8000"] # this is the endpoint to scrape
+            - targets: ["${PROMETHEUS_COLLECTOR_TARGET}"] # this is the endpoint to scrape
 
   otlp:
     protocols:
@@ -29,7 +29,7 @@ exporters:
     endpoint: "api.honeycomb.io:443"
     headers:
       "x-honeycomb-team": "${HONEYCOMB_APIKEY}"
-      "x-honeycomb-dataset": "test-metrics"
+      "x-honeycomb-dataset": "${HONEYCOMB_METRICS_DATASET}"
 
 service:
   pipelines:

@@ -15,10 +15,18 @@
     "type-check:watch": "npm run type-check -- --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "docker:collector:start": "docker compose --env-file ./.env --profile collectoronly up -d --build --force-recreate",
+    "docker:collector:stop": "docker compose --env-file ./.env --profile collectoronly down",
+    "docker:collector:logs": "docker compose logs collector",
+    "docker:server:logs": "docker compose logs server",
     "docker:build": "docker build --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 05_express_metrics .",
     "docker:run": "npm run docker:build && docker run --env-file ./.env -p 8000:8000 --rm -it --name 05_express_metrics 05_express_metrics",
     "docker:rebuild": "docker build --no-cache --target PRODUCTION -f Dockerfile --label \"org.opencontainers.image.created=$(date '+%Y-%m-%dT%H:%M:%SZ')\" --label \"org.opencontainers.image.version=${githubsha}\" --label \"org.opencontainers.image.url=$(git remote get-url origin)\" -t 05_express_metrics .",
-    "docker:stop": "docker stop 05_express_metrics"
+    "docker:stop": "docker stop 05_express_metrics",
+
+    "docker:compose:start": "docker compose --env-file ./.env --profile all up -d --build --force-recreate",
+    "docker:compose:stop": "docker compose --env-file ./.env --profile all down"
+
   },
   "nodemonConfig": {
     "watch": [
@@ -55,16 +63,19 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.5.9",
-    "@opentelemetry/auto-instrumentations-node": "^0.28.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.27.0",
-    "@opentelemetry/sdk-node": "^0.27.0",
-    "axios": "^0.27.2",
+    "@grpc/grpc-js": "^1.8.11",
+    "@opentelemetry/api": "^1.4.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.36.3",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "^0.35.1",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.35.1",
+    "@opentelemetry/instrumentation-http": "^0.35.1",
+    "@opentelemetry/sdk-node": "^0.35.1",
+    "axios": "^1.3.4",
     "dotenv": "^16.0.0",
-    "express": "^4.17.3",
+    "express": "^4.18.2",
     "express-pino-logger": "^7.0.0",
-    "express-prom-bundle": "^6.4.1",
+    "express-prom-bundle": "^6.6.0",
     "pino": "^7.9.2",
-    "prom-client": "^14.0.1"
+    "prom-client": "^14.1.1"
   }
 }

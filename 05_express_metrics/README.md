@@ -5,15 +5,46 @@ Demonstrates a simple Express app with Metrics using OpenTelemetry.
 NOTES:
 
 * Metrics are not supported on free tier `honeycomb`  
+* Currently this gets the collector to scrape metrics from service endpoint whilst traces are pushed through it.  It seems a bit messy doing it this way.  
+
+DEMONSTRATES:
+
+* Setting up a collector to despatch metrics to honeycomb.  
 
 TODO:
 
+* Get metrics and traces working with push through collector
+* Metrics push does not work with collector in compose and service running locally.  It can't find `0.0.0.0:8000/metrics`
 
+## Using compose to host server and collector
+
+```sh
+cd ./server
+
+# build and run
+npm run docker:compose:start
+
+# execute
+curl -X GET -v 0.0.0.0:8000/fetch\?count=10   
+
+# get the server logs 
+npm run docker:collector:logs
+npm run docker:server:logs
+
+
+docker compose exec -it ubuntu bash   
+ab -n 20 -c 2 http://server:8000/sleep
+
+# cleanup
+npm run docker:compose:stop
+```
 
 ## Run locally for development (server)
 
+NOTE: Metrics will not work with this as the collector cannot scrape when running against local build.  
+
 ```sh
-docker compose --env-file ./.env --profile collectoronly up -d --build --force-recreate
+npm run docker:collector:start
 
 # install
 cd ./server
@@ -35,26 +66,9 @@ curl 0.0.0.0:8000/metrics
 curl -X GET -v 0.0.0.0:8000/fetch\?count=10   
 curl -X POST --data 'https://google.com' -v 0.0.0.0:8000/fetch\?count=10   
 ab -n 20 -c 2 http://0.0.0.0:8000/  
-```
 
-### Using compose
-
-```sh
-# build
-docker compose --env-file ./.env --profile all build  
-
-# start services
-docker compose --env-file ./.env --profile all up -d --build --force-recreate
-
-# get the server logs 
-docker compose logs server 
-docker compose logs collector -f
-
-docker compose exec -it ubuntu bash   
-ab -n 20 -c 2 http://server:8000/sleep
-
-# cleanup
-docker compose --env-file ./.env --profile all down 
+# shutdown colllector
+npm run docker:collector:stop 
 ```
 
 ## Generate Load Test
@@ -76,15 +90,20 @@ artillery quick -n 10 -c 1 http://0.0.0.0:8000/ping
 ## Resources
 
 * express prometheus bundle [here](https://www.npmjs.com/package/express-prom-bundle)  
-* https://github.com/siimon/prom-client
-* https://docs.honeycomb.io/getting-data-in/metrics/prometheus/
+* Prometheus client for node.js [here](https://github.com/siimon/prom-client)  
+* Honeycomb Prometheus Clients [here](https://docs.honeycomb.io/getting-data-in/metrics/prometheus/)  
+* Honeycomb Metrics Overview [here](https://docs.honeycomb.io/getting-data-in/metrics/)
+* Honeycomb Host Metrics [here](https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-collector-host-metrics/)
+* Honeycomb App Metrics with OTel SDKs [here](https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/)  
+* OpenTelemetry Collector Demo Contib [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo)
+* Custom metrics in Node.js with OpenTelemetry (and Prometheus) [here](https://medium.com/google-cloud/custom-metrics-in-node-js-with-opentelemetry-and-prometheus-c10c8c0204d3)
+* OpenTelemetry SDK for Node.js https://www.npmjs.com/package/@opentelemetry/sdk-node
 
-* Metrics Overview https://docs.honeycomb.io/getting-data-in/metrics/
-* Host Metrics https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-collector-host-metrics/
-* App Metrics with OTel SDKs - https://docs.honeycomb.io/getting-data-in/metrics/opentelemetry-sdk/
-* https://www.npmjs.com/package/@opentelemetry/metrics
-* https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo
-
-* https://medium.com/google-cloud/custom-metrics-in-node-js-with-opentelemetry-and-prometheus-c10c8c0204d3
 
 https://github.com/chrisguest75/prometheus_examples/blob/master/03_nodejs_express_service/prometheus.yml
+
+
+https://github.com/open-telemetry/opentelemetry-js/blob/main/examples/opentelemetry-web/examples/metrics/index.js
+
+https://github.com/open-telemetry/opentelemetry-collector-contrib
+

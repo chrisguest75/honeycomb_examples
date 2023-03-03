@@ -11,6 +11,18 @@ receivers:
           static_configs:          
             - targets: ["${PROMETHEUS_COLLECTOR_TARGET}"] # this is the endpoint to scrape
 
+  hostmetrics:
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      load:
+      memory:
+      network:
+      process:
+      processes:
+      paging:
+
   otlp:
     protocols:
       grpc: # on port 4317
@@ -39,8 +51,7 @@ service:
       exporters: [otlp]
 
     metrics:
-      #receivers: [hostmetrics,prometheus]
-      receivers: [prometheus]
+      receivers: [hostmetrics,prometheus]
       processors: []
       exporters: [otlp/metrics]
 

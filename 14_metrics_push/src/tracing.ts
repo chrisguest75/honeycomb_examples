@@ -13,16 +13,12 @@ import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk
 
 const metadata = new Metadata()
 let sdk: any = null
-let meter: any = null
-export let requestCounter: any = null
-export let upDownCounter: any = null
 
 export async function shutdownHoneycomb() {
   logger.info('shutdownHoneycomb')
-  /*metrics
-    .getMeterProvider()
-    .shutdown()
-    .then(() => metrics.disable());*/
+
+  // disable metrics
+  metrics.disable()
 
   await sdk
     .shutdown()
@@ -60,10 +56,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, metric
   const metricExporter = new OTLPMetricExporter({
     url: endpoint,
     credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
-    headers: {
-      // 'x-honeycomb-team': apikey,
-      // 'x-honeycomb-dataset': metricsdataset,
-    },
+    headers: {},
   })
 
   const meterProvider = new MeterProvider()
@@ -75,16 +68,6 @@ export async function configureHoneycomb(apikey: string, dataset: string, metric
       exportIntervalMillis: 1000,
     }),
   )
-
-  meter = meterProvider.getMeter('example-exporter-collector')
-
-  requestCounter = meter.createCounter('requests', {
-    description: 'Example of a Counter',
-  });
-
-  upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
-    description: 'Example of a UpDownCounter',
-  });
 
   const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
 

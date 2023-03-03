@@ -6,21 +6,31 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc'
-import opentelemetry, { DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api'
+import opentelemetry, { DiagConsoleLogger, DiagLogLevel, metrics } from '@opentelemetry/api'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc'
+import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 
 const metadata = new Metadata()
 let sdk: any = null
+let meter: any = null
+export let requestCounter: any = null
+export let upDownCounter: any = null
 
 export async function shutdownHoneycomb() {
   logger.info('shutdownHoneycomb')
+  /*metrics
+    .getMeterProvider()
+    .shutdown()
+    .then(() => metrics.disable());*/
+
   await sdk
     .shutdown()
     .then(() => logger.info('Tracing terminated'))
     .catch((error: Error) => logger.error('Error terminating tracing', error))
 }
 
-export async function configureHoneycomb(apikey: string, dataset: string, servicename: string) {
+export async function configureHoneycomb(apikey: string, dataset: string, metricsdataset: string, servicename: string) {
   // configure otel diagnostics
   const enableDiag = process.env.ENABLE_OTEL_DIAG ?? 'false'
   const diagLogger = new DiagConsoleLogger()
@@ -38,6 +48,7 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
   }
 
   logger.info(`'${servicename}' in '${dataset}' using '${apikey}'`)
+  logger.info(`'${servicename}' in '${metricsdataset}' using '${apikey}'`)
 
   metadata.set('x-honeycomb-team', apikey)
   metadata.set('x-honeycomb-dataset', dataset)
@@ -46,6 +57,34 @@ export async function configureHoneycomb(apikey: string, dataset: string, servic
     credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
     metadata,
   })
+  const metricExporter = new OTLPMetricExporter({
+    url: endpoint,
+    credentials: insecure == true ? credentials.createInsecure() : credentials.createSsl(),
+    headers: {
+      // 'x-honeycomb-team': apikey,
+      // 'x-honeycomb-dataset': metricsdataset,
+    },
+  })
+
+  const meterProvider = new MeterProvider()
+  metrics.setGlobalMeterProvider(meterProvider)
+
+  meterProvider.addMetricReader(
+    new PeriodicExportingMetricReader({
+      exporter: metricExporter,
+      exportIntervalMillis: 1000,
+    }),
+  )
+
+  meter = meterProvider.getMeter('example-exporter-collector')
+
+  requestCounter = meter.createCounter('requests', {
+    description: 'Example of a Counter',
+  });
+
+  upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
+    description: 'Example of a UpDownCounter',
+  });
 
   const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
 

@@ -14,7 +14,11 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "docker:compose:start": "docker compose --env-file ./.env --profile all up -d --build --force-recreate",
+    "docker:compose:stop": "docker compose --env-file ./.env --profile all down",
+    "docker:collector:logs": "docker compose logs collector"
+
   },
   "keywords": [],
   "author": "",

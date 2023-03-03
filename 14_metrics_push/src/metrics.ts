@@ -12,10 +12,9 @@ export class Metrics {
 
   public constructor(servicename: string) {
     logger.info('Metrics initialized')
-    this.meter =  metrics.getMeterProvider().getMeter(servicename)
+    this.meter = metrics.getMeterProvider().getMeter(servicename)
     this._attributes = {
-      [SemanticResourceAttributes.SERVICE_NAME]: servicename,
-      service: servicename,
+      hostname: process.env.HOSTNAME || 'unknown',
     }
     this._attributes['service.name'] = servicename
 

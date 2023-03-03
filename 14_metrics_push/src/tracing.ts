@@ -59,7 +59,15 @@ export async function configureHoneycomb(apikey: string, dataset: string, metric
     headers: {},
   })
 
-  const meterProvider = new MeterProvider()
+  const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
+
+  const meterProvider = new MeterProvider({
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: servicename,
+      [SemanticResourceAttributes.SERVICE_VERSION]: serviceversion,
+    }),
+  })
+
   metrics.setGlobalMeterProvider(meterProvider)
 
   meterProvider.addMetricReader(
@@ -68,8 +76,6 @@ export async function configureHoneycomb(apikey: string, dataset: string, metric
       exportIntervalMillis: 1000,
     }),
   )
-
-  const serviceversion = process.env.SERVICE_VERSION ?? 'unset'
 
   sdk = new NodeSDK({
     resource: new Resource({

@@ -16,35 +16,19 @@ const {mkdir, readFile } = fs.promises;
 
 const logger = Logger.child({ service: 'queryCopyBucket' })
 
-async function uploadWithToken(url: string, file: string, title: string, token: string) {
-  const data = await readFile(file)
-  console.log(data.length)
-
-  const response = await axios({
-    method: 'POST',
-    url: `${url}?filename=${title}`,
-    data: Buffer.from(data),
-    headers: { 'content-type': 'video/mp4', authorization: `Bearer ${token}`, 'content-length': data.length },
-  })
-
-  return response.data
-}
-
 export const queryCopyBucketHandler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2) => {
   logger.info(`queryCopyBucketHandler ${JSON.stringify(event)}`)
 
   try {
     logger.info(event.body)
-    const { action, bucket, bucketRegion, prefix, segmentSize, token } = event.body
+    const { action, bucket, bucketRegion, prefix } = event.body
       ? (event.body as unknown as {
           action: string
           bucket: string
           bucketRegion: string
           prefix: string
-          segmentSize: number
-          token: string
         })
-      : { action: 'list', bucket: '', bucketRegion: '', prefix: '', segmentSize: 0, token: '' }
+      : { action: 'list', bucket: '', bucketRegion: '', prefix: '' }
 
     const client = new S3Client({
       region: bucketRegion,

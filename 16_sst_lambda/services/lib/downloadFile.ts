@@ -72,16 +72,11 @@ export async function downloadFile(
   childLogger.debug({ message: 'Download and save file locally', outFilepath })
   const filedata = await buffer
 
-  // This is caught outside the handler
   await writeFile(outFilepath, filedata)
   const segment = filename
   const srcLocalPath = outFilepath
 
-  // const b64data = filedata.toString('base64')
   childLogger.info({ message: 'Download complete', segment, srcLocalPath })
-
-  // report that we downloaded from s3
-  //data.statusReporting.downloadFromS3();
 
   return { segment, srcLocalPath }
 }

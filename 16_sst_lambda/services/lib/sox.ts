@@ -5,10 +5,7 @@ import { SOX_BASE_PATH } from '../constant/constant'
 const logger = Logger.child({ service: 'Sox' })
 
 /**
- * @description SoxTrim is used to manage the external sox process.
- * We use Sox to trim off the buffer that is left behind at the end of a decoded AAC file.
- * We know that all the segments sent comply with a specific duration.
- * We therefore trim back to the duration.
+ * @description Sox to test version
  */
 export class Sox {
   file: string

@@ -5,11 +5,9 @@ Demonstrate how to use SST to host a lambda function.
 TODO:
 
 * Parameterise regions and layer:versions locations better
+* Upgrade to SSTv2
 * SSM parameters
 * Add zod
-* Real file system in lambda.
-* The layers don't look right
-* Difference between start and deploy.
 * Single step debugging is not working.
 
 ## Reason
@@ -41,9 +39,9 @@ NOTES:
 ## Prepare
 
 ```sh
-npx create-sst@latest 16_sst_lambda
-
+# set correct version of node
 nvm use
+# install packages
 npm install
 ```
 
@@ -72,7 +70,7 @@ npm run start -- --stage ${SST_STAGE}
 To get the layers working correctly AFAICS you have to deploy to AWS
 
 ```sh
-# deploy to AWS
+# deploy to AWS (do not leave hosted as it can leak credentials)
 npm run deploy -- --stage ${SST_STAGE}
 ```
 
@@ -96,6 +94,8 @@ curl -X POST -H 'Content-Type: application/json' -d '{ "action":"listObjects", "
 curl -X POST -H 'Content-Type: application/json' -d '{ "action":"copyObjects", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "'${PREFIX}'" }' $STACK_URL/bucket
 
 curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/tmp", "recursive": true }' $STACK_URL/fs
+# DANGER!!!!
+curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/proc/1", "recursive": false }' $STACK_URL/fs   
 
 # run sox or ffmpeg
 curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/sox 
@@ -109,8 +109,16 @@ curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/ffmpeg
 npm run remove -- --stage ${SST_STAGE}
 ```
 
+## Creation
+
+```sh
+# use the wizard to create a template function
+npx create-sst@latest 16_sst_lambda
+```
+
 ## Resources
 
+* AWS Distro for OpenTelemetry Lambda [here](https://aws-otel.github.io/docs/getting-started/lambda)  
 * Serverless Stack Quick Start [here](https://docs.sst.dev/quick-start)  
 * Processing user-generated content using AWS Lambda and FFmpeg [here](https://aws.amazon.com/blogs/media/processing-user-generated-content-using-aws-lambda-and-ffmpeg)  
 * How to use queues in your serverless app [here](https://sst.dev/examples/how-to-use-queues-in-your-serverless-app.html)  

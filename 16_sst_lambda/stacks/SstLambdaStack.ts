@@ -3,13 +3,18 @@ import { Queue, StackContext, Api } from '@serverless-stack/resources'
 import { Tags } from 'aws-cdk-lib'
 import * as iam from 'aws-cdk-lib/aws-iam'
 
-// TODO: How do I configure this?
-const soxLayerArn = 'arn:aws:lambda:eu-west-1:633946266320:layer:16_sst_lambda_sox:3'
-const ffmpegLayerArn = 'arn:aws:lambda:eu-west-1:633946266320:layer:16_sst_lambda_ffmpeg:3'
 
 export function SstLambdaStack(context: StackContext) {
+  // TODO: How do I configure this?
+  const architecture = "amd64"
+  const soxLayerArn = `arn:aws:lambda:${context.stack.region}:633946266320:layer:16_sst_lambda_sox:3`
+  const ffmpegLayerArn = `arn:aws:lambda:${context.stack.region}:633946266320:layer:16_sst_lambda_ffmpeg:3`
+  // from https://aws-otel.github.io/docs/getting-started/lambda/lambda-js
+  const adotLayerArn = `arn:aws:lambda:${context.stack.region}:901920570463:layer:aws-otel-nodejs-${architecture}-ver-1-9-1:2`
+
   const soxLayer = LayerVersion.fromLayerVersionArn(context.stack, 'soxLayer', soxLayerArn)
   const ffmpegLayer = LayerVersion.fromLayerVersionArn(context.stack, 'ffmpegLayer', ffmpegLayerArn)
+  const adotLayer = LayerVersion.fromLayerVersionArn(context.stack, 'adotLayer', adotLayerArn)
 
   const tags = {
     created_by: 'sst',
@@ -59,7 +64,7 @@ export function SstLambdaStack(context: StackContext) {
           runtime: 'nodejs16.x',
           // Increase the timeout to 15 seconds
           timeout: 15,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
         },
       },
       'POST /sox': {

@@ -65,17 +65,21 @@ set +a
 ## Deploy Lambda
 
 ```sh
+# run locally
 npm run start -- --stage ${SST_STAGE}
 ```
 
+To get the layers working correctly AFAICS you have to deploy to AWS
+
 ```sh
+# deploy to AWS
 npm run deploy -- --stage ${SST_STAGE}
 ```
 
 ## Testing
 
 ```sh
-export STACK_URL=https://qomx89h8nl.execute-api.eu-west-1.amazonaws.com
+export STACK_URL=https://xxxxxxxxx.execute-api.eu-west-1.amazonaws.com
 # queue a message
 curl -X GET $STACK_URL 
 
@@ -96,6 +100,13 @@ curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/tmp", "recurs
 # run sox or ffmpeg
 curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/sox 
 curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/ffmpeg
+```
+
+## Cleanup
+
+```sh
+# deploy to AWS
+npm run remove -- --stage ${SST_STAGE}
 ```
 
 ## Resources

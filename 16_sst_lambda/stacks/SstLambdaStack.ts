@@ -97,8 +97,8 @@ export function SstLambdaStack(context: StackContext) {
               ],
               effect: iam.Effect.ALLOW,
               resources: [
-                `arn:aws:s3:::*`,
-                `arn:aws:s3:::*/*`,
+                `arn:aws:s3:::mybucket`,
+                `arn:aws:s3:::mybucket/*`,
               ],
             }),
           ],

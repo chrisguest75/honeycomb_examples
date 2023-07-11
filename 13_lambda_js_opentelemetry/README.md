@@ -28,4 +28,6 @@ npm run deploy && npm run invoke && npm run logs
 serverless create --template aws-nodejs
 ```
 
- 
+## Resources
+
+* AWS Distro for OpenTelemetry Lambda [here](https://aws-otel.github.io/docs/getting-started/lambda)  

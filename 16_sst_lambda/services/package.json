@@ -1,0 +1,12 @@
+{
+  "name": "@16-sst-lambda/services",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "aws-sdk": "^2.1292.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.109"
+  }
+}

@@ -1,0 +1,90 @@
+# syntax=docker/dockerfile:1.4
+FROM amazonlinux:2 AS preparelayer
+
+RUN buildDeps="autoconf \
+                automake \
+                cmake \
+                curl \
+                bzip2 \
+                libexpat1-dev \
+                g++ \
+                gcc \
+                git \
+                gperf \
+                libtool \
+                make \
+                meson \
+                nasm \
+                perl \
+                pkg-config \
+                python3 \
+                libssl-dev \
+                yasm \
+                zlib1g-dev \
+                zsh \
+                nano \
+                unzip \
+                zip \
+                xz-utils" && \
+          yum -y install ${buildDeps} && yum -y clean all  && rm -rf /var/cache
+
+COPY --chmod=755 <<EOF /bin/download.sh
+#!/usr/bin/env bash
+function verify_md5() {
+    : \${1?"\${FUNCNAME[0]}(url) - missing url argument"}
+    : \${2?"\${FUNCNAME[0]}(url) - missing md5 argument"}
+
+    local URL=\$1
+    local MD5=\$2
+    local FILENAME="./\$(basename \$URL)"
+    curl -s -o \$FILENAME \$URL 
+    local FILE_MD5=\$(md5sum \$FILENAME | tr " " "\n" | head -n 1)
+    #if [[ \$FILE_MD5 == \$MD5 ]]; then
+    #    echo "SUCCESS: MD5 for \$FILENAME matches \$MD5"
+    #else
+    #    >&2 echo "FAIL: MD5 for \$FILENAME does not match \$MD5 - actual \$FILE_MD5"
+    #    exit 1
+    #fi 
+}
+MD5="d04fba2d9245e661f245de0577f48a33"
+URL=https://nchc.dl.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.gz 
+verify_md5 "\$URL" "\$MD5"
+EOF
+
+WORKDIR /scratch
+
+RUN /bin/download.sh
+RUN tar -xf ./sox-14.4.2.tar.gz 
+
+WORKDIR /scratch/sox-14.4.2
+
+RUN ./configure --prefix=/scratch/out --with-pic --enable-static --disable-shared 
+RUN make -s && make install
+
+RUN /scratch/out/bin/sox || true
+
+RUN ls -laR /scratch/out
+
+# NOTE: Escape the \$ otherwise they are rendered at buildtime
+COPY --chmod=755 <<EOF /scratch/exportldd.sh
+#!/usr/bin/env bash
+ldd "/scratch/out/bin/sox" >  /scratch/libs.txt
+cat /scratch/libs.txt | awk 'NF == 4 { {print \$3} }' > /scratch/libs_extracted.txt    
+cat /scratch/libs_extracted.txt | awk -F/ -vOFS=/ '{ print \$1,\$2,\$3,\$4; }' | sort -u > /scratch/libs_paths.txt
+tar -cvf /scratch/libraries.tar --dereference -T /scratch/libs_paths.txt
+mkdir -p /sox/libs /sox/bin
+tar xf /scratch/libraries.tar --directory=/sox/libs
+cp "/scratch/out/bin/sox" /sox/bin
+mkdir -p /sox/libs/lib64
+cp /lib64/ld-linux-x86-64.so.2 /sox/libs/lib64/ld-linux-x86-64.so.2
+
+zip -r /scratch/layer.zip /sox
+EOF
+# NOTE: This is not required as there is an undocumented flag --chmod
+# RUN chmod +x /scratch/exportldd.sh && /scratch/exportldd.sh
+RUN /scratch/exportldd.sh
+CMD ["./sox/bin/sox", "--version"]
+
+FROM scratch AS zip
+
+COPY --from=preparelayer /scratch/layer.zip /layer.zip

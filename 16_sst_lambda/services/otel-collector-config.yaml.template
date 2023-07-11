@@ -1,0 +1,19 @@
+receivers:
+  otlp:
+    protocols:
+      grpc: # on port 4317
+      http:
+processors:
+  logging:
+    loglevel: 'info'
+exporters:
+  otlp:
+    endpoint: "api.honeycomb.io:443"
+    headers:
+      "x-honeycomb-team": "APIKEY"
+      "x-honeycomb-dataset": "METRIC_DATASET_NAME"
+service:
+  pipelines:
+    traces:
+      receivers: ['otlp']
+      exporters: ['logging', 'otlp']

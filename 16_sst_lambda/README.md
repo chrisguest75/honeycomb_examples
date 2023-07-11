@@ -4,6 +4,10 @@ Demonstrate how to use SST to host a lambda function.
 
 TODO:
 
+* How do I get outputs from SST?
+* How do I build a zip for serverless stack?
+* Passthrough varaibles into the stack?
+* Write a function to grab a file
 * Parameterise regions and layer:versions locations better
 * Upgrade to SSTv2
 * SSM parameters
@@ -72,6 +76,11 @@ To get the layers working correctly AFAICS you have to deploy to AWS
 ```sh
 # deploy to AWS (do not leave hosted as it can leak credentials)
 npm run deploy -- --stage ${SST_STAGE}
+
+
+# Get values requires env settings
+aws cloudformation describe-stacks --stack-name dev-16-sst-lambda-SstLambdaStack  --query "Stacks[0].Outputs" | jq -c '.[] | [.OutputKey, .OutputValue]'
+
 ```
 
 ## Testing
@@ -79,27 +88,27 @@ npm run deploy -- --stage ${SST_STAGE}
 ```sh
 export STACK_URL=https://xxxxxxxxx.execute-api.eu-west-1.amazonaws.com
 # queue a message
-curl -X GET $STACK_URL 
+curl -s -X GET $STACK_URL | jq .
 
 # look at filesystem
-curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/opt", "recursive": true }' $STACK_URL/fs
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "folder": "/opt", "recursive": true }' $STACK_URL/fs | jq .
 
 # bucket listing
 export PREFIX=single-file/
 
-curl -X POST -H 'Content-Type: application/json' -d '{ "action":"list", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "/" }' $STACK_URL/bucket
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "action":"list", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "/" }' $STACK_URL/bucket | jq . 
 
-curl -X POST -H 'Content-Type: application/json' -d '{ "action":"listObjects", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "'${PREFIX}'" }' $STACK_URL/bucket
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "action":"listObjects", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "'${PREFIX}'" }' $STACK_URL/bucket | jq . 
 
-curl -X POST -H 'Content-Type: application/json' -d '{ "action":"copyObjects", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "'${PREFIX}'" }' $STACK_URL/bucket
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "action":"copyObjects", "bucket": "mybucket", "bucketRegion": "us-east-1", "prefix": "'${PREFIX}'" }' $STACK_URL/bucket | jq . 
 
-curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/tmp", "recursive": true }' $STACK_URL/fs
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "folder": "/tmp", "recursive": true }' $STACK_URL/fs | jq . 
 # DANGER!!!!
-curl -X POST -H 'Content-Type: application/json' -d '{ "folder": "/proc/1", "recursive": false }' $STACK_URL/fs   
+curl -s -X POST -H 'Content-Type: application/json' -d '{ "folder": "/proc/1", "recursive": false }' $STACK_URL/fs | jq . 
 
 # run sox or ffmpeg
-curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/sox 
-curl -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/ffmpeg
+curl -s -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/sox | jq . 
+curl -s -X POST -H 'Content-Type: application/json' -d '{}' $STACK_URL/ffmpeg | jq . 
 ```
 
 ## Cleanup
@@ -130,3 +139,4 @@ npx create-sst@latest 16_sst_lambda
 * AWS Lambda FAQs [here](https://aws.amazon.com/lambda/faqs/)  
 * Lambda runtimes [here](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)
 * Creating and sharing Lambda layers [here](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html)
+* Upgrade to v2.0 [here](https://docs.sst.dev/upgrade-guide#upgrade-to-v20)  

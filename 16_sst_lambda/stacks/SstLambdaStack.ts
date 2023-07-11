@@ -10,7 +10,7 @@ export function SstLambdaStack(context: StackContext) {
   const soxLayerArn = `arn:aws:lambda:${context.stack.region}:633946266320:layer:16_sst_lambda_sox:3`
   const ffmpegLayerArn = `arn:aws:lambda:${context.stack.region}:633946266320:layer:16_sst_lambda_ffmpeg:3`
   // from https://aws-otel.github.io/docs/getting-started/lambda/lambda-js
-  const adotLayerArn = `arn:aws:lambda:${context.stack.region}:901920570463:layer:aws-otel-nodejs-${architecture}-ver-1-9-1:2`
+  const adotLayerArn = `arn:aws:lambda:${context.stack.region}:901920570463:layer:aws-otel-nodejs-${architecture}-ver-1-13-0:2`
 
   const soxLayer = LayerVersion.fromLayerVersionArn(context.stack, 'soxLayer', soxLayerArn)
   const ffmpegLayer = LayerVersion.fromLayerVersionArn(context.stack, 'ffmpegLayer', ffmpegLayerArn)
@@ -46,7 +46,13 @@ export function SstLambdaStack(context: StackContext) {
           runtime: 'nodejs16.x',
           // Increase the timeout to 15 seconds
           timeout: 15,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
+          environment: {
+            FUNCTION_NAME: 'functions/root.root',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+            // OPENTELEMETRY_COLLECTOR_CONFIG_FILE: 
+          },
         },
       },
       'GET /queue': {
@@ -55,7 +61,12 @@ export function SstLambdaStack(context: StackContext) {
           runtime: 'nodejs16.x',
           // Increase the timeout to 15 seconds
           timeout: 15,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
+          environment: {
+            FUNCTION_NAME: 'functions/addQueue.addQueue',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+          },
         },
       },
       'POST /fs': {
@@ -65,6 +76,11 @@ export function SstLambdaStack(context: StackContext) {
           // Increase the timeout to 15 seconds
           timeout: 15,
           layers: [soxLayer, ffmpegLayer, adotLayer],
+          environment: {
+            FUNCTION_NAME: 'functions/queryFilesystem.queryFilesystem',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+          },
         },
       },
       'POST /sox': {
@@ -73,7 +89,12 @@ export function SstLambdaStack(context: StackContext) {
           runtime: 'nodejs16.x',
           // Increase the timeout to 15 seconds
           timeout: 15,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
+          environment: {
+            FUNCTION_NAME: 'functions/querySox.querySox',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+          },
         },
       },
       'POST /ffmpeg': {
@@ -82,13 +103,23 @@ export function SstLambdaStack(context: StackContext) {
           runtime: 'nodejs16.x',
           // Increase the timeout to 15 seconds
           timeout: 15,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
+          environment: {
+            FUNCTION_NAME: 'functions/queryFfmpeg.queryFfmpeg',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+          },
         },
       },
       'POST /bucket': {
         function: {
           handler: 'functions/queryCopyBucket.queryCopyBucket',
           runtime: 'nodejs16.x',
+          environment: {
+            FUNCTION_NAME: 'functions/queryCopyBucket.queryCopyBucket',
+            QUEUE_URL: queue.queueUrl,
+            AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-handler',
+          },
           permissions: [
             new iam.PolicyStatement({
               actions: [
@@ -109,12 +140,13 @@ export function SstLambdaStack(context: StackContext) {
           ],
           // Increase the timeout to 15 seconds
           timeout: 600,
-          layers: [soxLayer, ffmpegLayer],
+          layers: [soxLayer, ffmpegLayer, adotLayer],
         },
       },
     },
   })
   context.stack.addOutputs({
     ApiEndpoint: api.url,
+    QueueUrl: queue.queueUrl,
   })
 }

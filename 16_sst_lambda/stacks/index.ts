@@ -7,6 +7,8 @@ export default function (app: App) {
     srcPath: 'services',
     bundle: {
       format: 'esm',
+      copyFiles: [{ from: 'otel-collector-config.yaml' }],
+      buildOutputDir: 'output',
     },
   })
   app.stack(SstLambdaStack)
